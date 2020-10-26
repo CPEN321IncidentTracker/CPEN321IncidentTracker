@@ -41,13 +41,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private LocationManager locationManager;
-    private String BASE_URL = "http://192.168.0.11:3000";
+    private String BASE_URL = "http://52.149.135.175:80";
     final static String TAG = "MapActivity";
     private Button returnHomeButton;
     private Button safetyScoreButton;
     private Button postNewIncidentButton;
     public List<Incident> incidents = new LinkedList<>();
-    private ListOfIncidents incidents2 = new ListOfIncidents();
     private LatLng myLocation;
     private Marker blueMarker;
     private static double standardizedDistance = 2; //kilometers
@@ -82,14 +81,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
 
                 double score = 0;
+                int nearbyIncidents = 0;
 
+                // Safety score calculation
                 for (Incident i : incidents){
                     double distance = i.distanceFrom(blueMarker.getPosition());
-                    double result = i.getSeverity() * (standardizedDistance / distance);
+                    double result = 0;
+                    nearbyIncidents += 1;
+                    if(distance < 5){
+                        result = 5.0*(i.getSeverity())/5.0;
+                    } else if(distance < 7) {
+                        result = 4.0*(i.getSeverity())/5.0;
+                    } else if(distance < 9) {
+                        result = 3.0*(i.getSeverity())/5.0;
+                    } else {
+                        result = 0.0;
+                        nearbyIncidents -= 1;
+                    }
                     score += result;
                 }
 
-                Toast.makeText(MapsActivity.this, "The safety score at this location is" + score, Toast.LENGTH_LONG).show();
+                if (nearbyIncidents==0) {
+                    score = 5;
+                } else {
+                    score = score / nearbyIncidents;
+                    score = 5-score;
+                }
+
+                Toast.makeText(MapsActivity.this, "The safety score at this location is " + score, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -106,6 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        // Initialize retrofit objects
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -128,9 +148,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int severity = extras.getInt("severity");
             String title = extras.getString("title");
             incidents.add(new Incident(title,latitude,longitude,severity));
-            Toast.makeText(this, "There are extras", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "There are no extras", Toast.LENGTH_LONG).show();
         }
 
 
@@ -162,11 +179,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        // Wait 5 seconds before displaying current location
         Toast.makeText(MapsActivity.this, "Give us a moment...", Toast.LENGTH_LONG).show();
         (new Handler()).postDelayed(this::displayCurrentLocation, 5000);
 
+        // Call the sever and get the list of incidents
         Call<List<Incident>> call = retrofitInterface.getIncidents();
-
         call.enqueue(new Callback<List<Incident>>() {
             @Override
             public void onResponse(Call<List<Incident>> call, Response<List<Incident>> response) {
@@ -176,17 +194,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
                 incidents.addAll(response.body());
-                for (Incident i: incidents) {
-                    mMap.addMarker(new MarkerOptions().position(i.getLocation()).title(i.getTitle() + " (" + i.getSeverity() + ")"));
-                }
 
-                /*Log.d("JEFF", String.valueOf(response.body().getIncidentList().get(1).getTitle()));
-                incidents.addAll(response.body().getIncidentList());
+                // Add markers at incidents from server
                 for (Incident i: incidents) {
-                    Log.d("BOOB", i.getTitle());
                     mMap.addMarker(new MarkerOptions().position(i.getLocation()).title(i.getTitle() + " (" + i.getSeverity() + ")"));
                 }
-                incidents2 = response.body();*/
                 Toast.makeText(MapsActivity.this, "Response was successful", Toast.LENGTH_LONG).show();
             }
 
@@ -194,23 +206,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onFailure(Call<List<Incident>> call, Throwable t) {
 
                 Toast.makeText(MapsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-                incidents.add(new Incident("Some dude was murdered here", 37.4567,-122.11475,5));
-                incidents.add(new Incident("Robbery", 37.47347, -122.1349, 3));
-                incidents.add(new Incident("Drug Deal :o", 37.4631, -122.13859, 2));
-
             }
         });
-
-        for (Incident i : incidents){
-            Log.d("BOB", i.getTitle());
-        }
-
-
-
-
-
     }
 
+    // Method to display current location
     private void displayCurrentLocation() {
         blueMarker = mMap.addMarker(new MarkerOptions().position(myLocation).title("You are here").draggable(true).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {

@@ -2,6 +2,7 @@ package com.example.locationtest;
 
 import com.google.android.gms.maps.model.LatLng;
 
+// Describes an incident with title, severity, and location and (latitude, longitude)
 public class Incident {
 
     private String title;
@@ -28,6 +29,7 @@ public class Incident {
         return severity;
     }
 
+    // Calculates great-circle distance between two (lat, long) points using Haversine formula
     public double distanceFrom(LatLng someLocation){
         double p = Math.PI / 180;
         double lat1 = someLocation.latitude;

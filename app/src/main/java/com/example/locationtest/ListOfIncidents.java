@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+// Describes a list of incidents
 public class ListOfIncidents {
 
     private List<Incident> incidentList = new List<Incident>() {

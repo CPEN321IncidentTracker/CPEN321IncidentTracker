@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Create button to get location permissions
         locationButton = findViewById(R.id.location_button);
         locationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Create maps button to open map
         mapsButton = (Button) findViewById(R.id.maps_button);
         mapsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Method for checking Location Permissions
     private void checkLocationPermissions() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
             && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){

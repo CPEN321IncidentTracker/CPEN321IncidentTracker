@@ -24,7 +24,7 @@ public class NewIncidentPostActivity extends AppCompatActivity {
 
     private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
-    private String BASE_URL = "http://192.168.0.11:3000";
+    private String BASE_URL = "http://52.149.135.175:80";
     private LatLng location;
     private EditText incidentTitleEntry;
     private EditText incidentSeverityEntry;
@@ -48,12 +48,13 @@ public class NewIncidentPostActivity extends AppCompatActivity {
             location = new LatLng(latitude, longitude);
         }
 
+        // Instantiate retrofit objects
         retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
         retrofitInterface = retrofit.create(RetrofitInterface.class);
 
+        // Instantiate text entries and buttons
         incidentTitleEntry = findViewById(R.id.incidentTitleEntry);
         incidentSeverityEntry = findViewById(R.id.incidentSeverityEntry);
         submitButton = findViewById(R.id.submitButton);
@@ -65,14 +66,15 @@ public class NewIncidentPostActivity extends AppCompatActivity {
                 incidentSeverity = Integer.parseInt(incidentSeverityEntry.getText().toString());
                 incidentTitle = incidentTitleEntry.getText().toString();
 
+                // Hashmap to be sent to server
                 HashMap<String, String> map = new HashMap<>();
                 map.put("title", incidentTitle);
                 map.put("severity", incidentSeverityEntry.getText().toString());
                 map.put("latitude", Double.toString(location.latitude));
                 map.put("longitude", Double.toString(location.longitude));
 
+                // Send map to server
                 Call<Void> call = retrofitInterface.executeIncident(map);
-
                 call.enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
@@ -89,6 +91,7 @@ public class NewIncidentPostActivity extends AppCompatActivity {
                     }
                 });
 
+                // Return to map activity and display new incident
                 Intent mapIntent = new Intent(NewIncidentPostActivity.this, MapsActivity.class);
                 mapIntent.putExtra("severity", incidentSeverity);
                 mapIntent.putExtra("title", incidentTitle);
@@ -98,6 +101,7 @@ public class NewIncidentPostActivity extends AppCompatActivity {
             }
         });
 
+        // Cancels submission
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
