@@ -29,19 +29,30 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.LinkedList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
     private LocationManager locationManager;
+    private String BASE_URL = "http://192.168.0.11:3000";
     final static String TAG = "MapActivity";
     private Button returnHomeButton;
     private Button safetyScoreButton;
     private Button postNewIncidentButton;
-    private LinkedList<Incident> incidents = new LinkedList<>();
+    public List<Incident> incidents = new LinkedList<>();
+    private ListOfIncidents incidents2 = new ListOfIncidents();
     private LatLng myLocation;
     private Marker blueMarker;
     private static double standardizedDistance = 2; //kilometers
+    private Retrofit retrofit;
+    private RetrofitInterface retrofitInterface;
 
 
     @Override
@@ -95,10 +106,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        retrofitInterface = retrofit.create(RetrofitInterface.class);
+
+
+
         // Temporary code to create a list of incidents
-        incidents.add(new Incident("Some dude was murdered here", 37.4567,-122.11475,5));
+        /*incidents.add(new Incident("Some dude was murdered here", 37.4567,-122.11475,5));
         incidents.add(new Incident("Robbery", 37.47347, -122.1349, 3));
-        incidents.add(new Incident("Drug Deal :o", 37.4631, -122.13859, 2));
+        incidents.add(new Incident("Drug Deal :o", 37.4631, -122.13859, 2));*/
 
         // Add an incident if arriving from submitting an incident
         Bundle extras = getIntent().getExtras();
@@ -142,12 +162,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        for (Incident i : incidents){
-            mMap.addMarker(new MarkerOptions().position(i.getLocation()).title(i.getTitle() + " (" + i.getSeverity() + ")"));
-        }
-
         Toast.makeText(MapsActivity.this, "Give us a moment...", Toast.LENGTH_LONG).show();
         (new Handler()).postDelayed(this::displayCurrentLocation, 5000);
+
+        Call<List<Incident>> call = retrofitInterface.getIncidents();
+
+        call.enqueue(new Callback<List<Incident>>() {
+            @Override
+            public void onResponse(Call<List<Incident>> call, Response<List<Incident>> response) {
+                if (!response.isSuccessful()) {
+                    Toast.makeText(MapsActivity.this, "Code: " + response.code(), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                incidents.addAll(response.body());
+                for (Incident i: incidents) {
+                    mMap.addMarker(new MarkerOptions().position(i.getLocation()).title(i.getTitle() + " (" + i.getSeverity() + ")"));
+                }
+
+                /*Log.d("JEFF", String.valueOf(response.body().getIncidentList().get(1).getTitle()));
+                incidents.addAll(response.body().getIncidentList());
+                for (Incident i: incidents) {
+                    Log.d("BOOB", i.getTitle());
+                    mMap.addMarker(new MarkerOptions().position(i.getLocation()).title(i.getTitle() + " (" + i.getSeverity() + ")"));
+                }
+                incidents2 = response.body();*/
+                Toast.makeText(MapsActivity.this, "Response was successful", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<List<Incident>> call, Throwable t) {
+
+                Toast.makeText(MapsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                incidents.add(new Incident("Some dude was murdered here", 37.4567,-122.11475,5));
+                incidents.add(new Incident("Robbery", 37.47347, -122.1349, 3));
+                incidents.add(new Incident("Drug Deal :o", 37.4631, -122.13859, 2));
+
+            }
+        });
+
+        for (Incident i : incidents){
+            Log.d("BOB", i.getTitle());
+        }
+
+
 
 
 
