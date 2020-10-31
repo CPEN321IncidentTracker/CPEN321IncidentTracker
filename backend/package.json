@@ -1,0 +1,15 @@
+{
+    "name": "incident_tracker_app",
+    "scripts": {
+        "test": "jest",
+        "test:watch": "jest --watch"
+    },
+    "devDependencies": {
+        "jest": "^26.6.1",
+        "supertest": "^6.0.0"
+    },
+    "dependencies": {
+        "@shelf/jest-mongodb": "^1.2.3"
+    },
+    "preset": "@shelf/jest-mongodb"
+}
