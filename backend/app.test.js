@@ -1,6 +1,6 @@
 //test get /incidents
 
-//const { expect } = require("@jest/globals");
+const { expect } = require("@jest/globals");
 
 const app = require('./app')
 const supertest = require('supertest')
@@ -15,9 +15,11 @@ describe('GET tests', () =>{
     let db;
 
     beforeAll(async ()=> {
+        console.log(global.__MONGO_URI__);
         connection = await MongoClient.connect(global.__MONGO_URI__, {
             useNewUrlParser : true,
         });
+        //db = await connection.db(global.__MONGO_DB_NAME__);
         db = await connection.db(global.__MONGO_DB_NAME__);
     });
 
@@ -47,7 +49,8 @@ describe('GET tests', () =>{
     console.log(Http.response);
     */
         const response = await request.get('/incident')
-        console.log(response)
+        //console.log(response)
+        expect(response == mockincidentlist)
         //console.log(mockincidentlist())
         done();
     });

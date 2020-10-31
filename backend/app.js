@@ -37,7 +37,7 @@ mongoClient.connect(url, (err, db) => {
         ]}
 
         collection.insertOne(listOfIncidents)*/
-
+/*
         collection.insertOne({
             title: "Example1",
             severity: 5,
@@ -59,7 +59,7 @@ mongoClient.connect(url, (err, db) => {
             longitude: -122.13859,
         })
 
-
+*/
         collection.find({}).toArray((err, result) => {
             if (err) throw err
             //console.log(result)
