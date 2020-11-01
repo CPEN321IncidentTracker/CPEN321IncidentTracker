@@ -70,8 +70,9 @@ mongoClient.connect(url, (err, db) => {
         app.get('/incident', async (req, res) => {
             collection.find({}).toArray((err, result) => {
                 if (err) throw err
-                console.log(result)
+                //console.log(result)
                 res.send(result)
+                //collection.deleteMany()
             })
         })
         
@@ -83,19 +84,17 @@ mongoClient.connect(url, (err, db) => {
                 latitude: parseFloat(req.body.latitude),
                 longitude: parseFloat(req.body.longitude)
             }
-
+            /*
             console.log(newIncident.title)
             console.log(newIncident.severity)
             console.log(newIncident.latitude)
             console.log(newIncident.longitude)
-
+            */
             collection.insertOne(newIncident)
             res.status(200).send()
 
-            
         })
 
-        
     }
 })
 
