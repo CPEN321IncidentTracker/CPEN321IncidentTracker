@@ -1,9 +1,5 @@
 {
     "name": "incident_tracker_app",
-    "jest": {
-        "verbose": true,
-        "preset": "@shelf/jest-mongodb"
-    },
     "scripts": {
         "test": "jest",
         "test:watch": "jest --watch"
