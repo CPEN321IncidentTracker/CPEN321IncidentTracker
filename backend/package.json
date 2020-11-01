@@ -1,7 +1,8 @@
 {
     "name": "incident_tracker_app",
     "jest": {
-        "verbose": true
+        "verbose": true,
+        "preset": "@shelf/jest-mongodb"
     },
     "scripts": {
         "test": "jest",
@@ -10,11 +11,11 @@
     "devDependencies": {
         "jest": "^26.6.1",
         "mongodb-memory-server": "^6.9.2",
+        "mongodb-memory-server-core": "^6.9.2",
         "supertest": "^6.0.0"
     },
     "dependencies": {
         "@shelf/jest-mongodb": "^1.2.3",
         "mongodb": "^3.6.2"
-    },
-    "preset": "@shelf/jest-mongodb"
+    }
 }

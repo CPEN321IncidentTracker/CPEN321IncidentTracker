@@ -1,4 +1,9 @@
-//test get /incidents
+//installs:
+//npm install --save-dev jest
+//npm install supertest --save-dev supertest
+//npm install @shelf/jest-mongodb --dev
+//npm install mongodb-memory-server --save-dev
+//npm install mongodb-memory-server-core --save-dev
 
 const { expect } = require("@jest/globals");
 
@@ -7,8 +12,6 @@ const supertest = require('supertest')
 const request = supertest(app)
 const {MongoClient} = require('mongodb');
 
-//const Http = new XMLHttpRequest();
-//const url = 'http://localhost:3000/incident'
 
 describe('GET tests', () =>{
     let connection;
@@ -17,7 +20,7 @@ describe('GET tests', () =>{
     beforeAll(async ()=> {
         console.log(global.__MONGO_URI__);
         connection = await MongoClient.connect(global.__MONGO_URI__, {
-            useNewUrlParser : true,
+            useNewUrlParser : true
         });
         //db = await connection.db(global.__MONGO_DB_NAME__);
         db = await connection.db(global.__MONGO_DB_NAME__);
@@ -39,15 +42,7 @@ describe('GET tests', () =>{
 
     it('should return a collection consisting of three mocked incidents', 
         async done=>{
-    /*
-    Http.open("GET", url);
-    Http.send()
-    Http.onreadystatechange=(e)=>{
-        console.log(Http.response);
-    } 
-    expect(Http.responseText).toBe(mockincidentlist());
-    console.log(Http.response);
-    */
+
         const response = await request.get('/incident')
         //console.log(response)
         expect(response == mockincidentlist)
