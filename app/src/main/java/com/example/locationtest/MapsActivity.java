@@ -105,7 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     score = 5;
                 } else {
                     score = score / nearbyIncidents;
-                    score = 5-score;
+                    
                 }
 
                 Toast.makeText(MapsActivity.this, "The safety score at this location is " + score, Toast.LENGTH_LONG).show();
