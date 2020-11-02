@@ -1,10 +1,9 @@
 language: node_js
 node_js: 12
-services:
-  -mongodb
+services: mongodb
 cache:
   directories:
-    -backend/node_modules
+    -/backend/node_modules
 install:
   -cd backend
   -npm install
