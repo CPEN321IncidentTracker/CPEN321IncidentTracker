@@ -2,18 +2,29 @@ const express = require('express')
 const { read } = require('fs')
 const app = express()
 const mongoClient = require('mongodb').MongoClient
-
 const url = "mongodb://localhost:27017"
+//const url = "mongodb://localhost:27017/app"
 
 app.use(express.json()) //enable json parsing
 
-mongoClient.connect(url, (err, db) => {
+const server = app.listen(3000, () => {
+    console.log("Listening on port 3000...")
+});
+module.exports = server;
+
+var myDb
+var collection
+
+mongoClient.connect(url, {
+    useNewUrlParser : true,
+    useUnifiedTopology : true,
+    },(err, db) => {
 
     if (err) {
         console.log("Error while connecting mongo client")
     } else {
-        const myDb = db.db('myDb')
-        const collection = myDb.collection('myTable')
+        myDb = db.db('myDb')
+        collection = myDb.collection('myTable')
 
         /*const listOfIncidents = {incidentList : [
             {
@@ -63,9 +74,7 @@ mongoClient.connect(url, (err, db) => {
         collection.find({}).toArray((err, result) => {
             if (err) throw err
             //console.log(result)
-
-        })
-
+        }) 
 
         app.get('/incident', async (req, res) => {
             collection.find({}).toArray((err, result) => {
@@ -73,10 +82,10 @@ mongoClient.connect(url, (err, db) => {
                 //console.log(result)
                 res.send(result)
                 //collection.deleteMany()
-            })
+                })
         })
         
-        app.post('/incident', (req, res) => {
+        app.post('/incident', async (req, res) => {
 
             const newIncident = {
                 title: req.body.title,
@@ -92,14 +101,24 @@ mongoClient.connect(url, (err, db) => {
             */
             collection.insertOne(newIncident)
             res.status(200).send()
+        })        
 
+        //this function is used exclusively to close the
+        //database connection and clearing it for testing
+        //Also closes the app.listen port
+        app.delete('/incident', async (req, res) => {
+            await collection.deleteMany()
+            res.send('database cleared')
+            db.close()
+            server.close()
         })
 
     }
 })
 
-const server = app.listen(3000, () => {
-    console.log("Listening on port 3000...")
-});
-module.exports = server;
 
+
+
+
+
+//module.exports = app;
