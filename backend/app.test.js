@@ -25,20 +25,7 @@ describe('Simple test', () =>{
     let agent;
     
     beforeAll(async ()=> {
-        /*
-        const uri = await mongod.getUri();
-        //const dbName = await mongod.getDbName();
-        //console.log(uri);
-        //console.log(dbName);
-        await mongoClient.connect(uri, {
-            useNewUrlParser : true,
-            useUnifiedTopology : true,
-        });
-        //db = await connection.db(global.__MONGO_DB_NAME__);
-        //db = await connection.db(dbName);
-        //console.log(process.env)
-        */
-        //console.log(global.__MONGO_URI__);
+        
         connection = await mongoClient.connect("mongodb://localhost:27017");
         //db = await connection.db(global.__MONGO_DB_NAME__);
 
@@ -46,30 +33,17 @@ describe('Simple test', () =>{
 
     afterAll(async done=> {
         
-        //await connection.deleteMany();
-        //await connection.close();
-        //await db.close();
-        
-        //await jestMongodbConfig.stop();
-        
         await connection.close(done);
         
         //await global.__MONGOD__.stop();
     });
     
     beforeEach(async ()=> {
-        //server = await App.listen(3000);
-        /*
-        server = App.listen(3000, (err)=>{
-            if (err) return done(err);
-            agent = request.agent(server)
-        })
-        */
+        
     })
 
     afterEach( async ()=> {
-        //await App.close(done);
-        //return server && server.close(done);
+    
     })
 
     const mockincidentlist = jest.fn();
