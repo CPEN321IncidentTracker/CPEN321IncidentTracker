@@ -9,6 +9,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,20 +19,25 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.GeoApiContext;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import okhttp3.internal.Util;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,6 +47,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
+    private UiSettings mUiSettings;
     private LocationManager locationManager;
     private String BASE_URL = "http://52.149.135.175:80";
     final static String TAG = "MapActivity";
@@ -63,6 +71,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        SearchView searchView;
+        searchView = findViewById(R.id.sv_location);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                String result = searchView.getQuery().toString();
+                List<Address> addressList = null;
+
+                if (result != null || !result.equals("")){
+                    Geocoder geocoder = new Geocoder(MapsActivity.this);
+                    try {
+                        addressList = geocoder.getFromLocationName(result, 1);
+                        Address address = addressList.get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        blueMarker.setPosition(latLng);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
 
         // Initialize home button
         returnHomeButton = findViewById(R.id.returnHomeButton);
@@ -84,16 +123,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 int nearbyIncidents = 0;
 
                 // Safety score calculation
-                for (Incident i : incidents){
+                for (Incident i : incidents) {
                     double distance = i.distanceFrom(blueMarker.getPosition());
                     double result = 0;
                     nearbyIncidents += 1;
-                    if(distance < 5){
-                        result = 5.0*(i.getSeverity())/5.0;
-                    } else if(distance < 7) {
-                        result = 4.0*(i.getSeverity())/5.0;
-                    } else if(distance < 9) {
-                        result = 3.0*(i.getSeverity())/5.0;
+                    if (distance < 5) {
+                        result = 5.0 * (i.getSeverity()) / 5.0;
+                    } else if (distance < 7) {
+                        result = 4.0 * (i.getSeverity()) / 5.0;
+                    } else if (distance < 9) {
+                        result = 3.0 * (i.getSeverity()) / 5.0;
                     } else {
                         result = 0.0;
                         nearbyIncidents -= 1;
@@ -101,11 +140,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     score += result;
                 }
 
-                if (nearbyIncidents==0) {
+                if (nearbyIncidents == 0) {
                     score = 5;
                 } else {
                     score = score / nearbyIncidents;
-                    
+
                 }
 
                 Toast.makeText(MapsActivity.this, "The safety score at this location is " + score, Toast.LENGTH_LONG).show();
@@ -134,7 +173,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         retrofitInterface = retrofit.create(RetrofitInterface.class);
 
 
-
         // Temporary code to create a list of incidents
         /*incidents.add(new Incident("Some dude was murdered here", 37.4567,-122.11475,5));
         incidents.add(new Incident("Robbery", 37.47347, -122.1349, 3));
@@ -142,12 +180,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add an incident if arriving from submitting an incident
         Bundle extras = getIntent().getExtras();
-        if(extras != null){
+        if (extras != null) {
             Double latitude = extras.getDouble("latitude");
             Double longitude = extras.getDouble("longitude");
             int severity = extras.getInt("severity");
             String title = extras.getString("title");
-            incidents.add(new Incident(title,latitude,longitude,severity));
+            incidents.add(new Incident(title, latitude, longitude, severity));
         }
 
 
@@ -178,6 +216,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+
+        mUiSettings = mMap.getUiSettings();
+        mUiSettings.setAllGesturesEnabled(true);
+        mUiSettings.setZoomControlsEnabled(true);
+        mUiSettings.setMyLocationButtonEnabled(true);
+        mUiSettings.setZoomGesturesEnabled(true);
+        mUiSettings.setTiltGesturesEnabled(true);
+        mUiSettings.setRotateGesturesEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                blueMarker.setPosition(myLocation);
+                return false;
+            }
+        });
 
         // Wait 5 seconds before displaying current location
         Toast.makeText(MapsActivity.this, "Give us a moment...", Toast.LENGTH_LONG).show();
@@ -208,6 +272,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText(MapsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+
+
     }
 
     // Method to display current location
@@ -254,4 +320,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onProviderDisabled(@NonNull String provider) {
 
     }
+
 }

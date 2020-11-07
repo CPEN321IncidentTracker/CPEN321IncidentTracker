@@ -11,8 +11,14 @@
         android:id="@+id/map"
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="796dp"
+        android:layout_height="665dp"
         android:scrollbars="vertical" />
+
+    <SearchView
+        android:layout_width="match_parent"
+        android:layout_height="37dp"
+        android:id="@+id/sv_location"
+        />
 
     <RadioGroup
         android:id="@+id/radio_group_list_selector"
@@ -20,6 +26,8 @@
         android:layout_height="48dp"
         android:orientation="horizontal"
         android:background="#80000000"
+        android:layout_gravity="bottom
+"
          >
 
         <RadioButton
@@ -40,10 +48,9 @@
             android:id="@+id/addIncidentButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:gravity="center_horizontal|center_vertical"
-            android:text="@string/add_incident_at_marker"
             android:layout_weight="1"
-            />
+            android:gravity="center_horizontal|center_vertical"
+            android:text="@string/add_incident_at_marker" />
 
         <View
             android:id="@+id/VerticalLine2"
