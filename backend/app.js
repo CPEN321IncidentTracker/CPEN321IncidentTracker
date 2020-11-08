@@ -1,18 +1,18 @@
 const express = require("express");
-const { read } = require('fs');
-const app = express()
-const mongoClient = require('mongodb').MongoClient
+const { read } = require("fs");
+const app = express();
+const mongoClient = require("mongodb").MongoClient;
 const url = "mongodb://localhost:27017";
 //const url = "mongodb://localhost:27017/app"
 
-app.use(express.json()) //enable json parsing
+app.use(express.json()); //enable json parsing
 
 const server = app.listen(3000, () => {
-    console.log("Listening on port 3000...")
+    //console.log("Listening on port 3000...")
 });
 module.exports = server;
 
-var myDb
+var myDb;
 var collection;
 
 mongoClient.connect(url, {
@@ -21,10 +21,10 @@ mongoClient.connect(url, {
     },(err, db) => {
 
     if (err) {
-        console.log("Error while connecting mongo client")
+        console.log("Error while connecting mongo client");
     } else {
-        myDb = db.db("myDb")
-        collection = myDb.collection('myTable')
+        myDb = db.db("myDb");
+        collection = myDb.collection("myTable");
 
         /*const listOfIncidents = {incidentList : [
             {
@@ -76,13 +76,15 @@ mongoClient.connect(url, {
                 throw err;
             }
             //console.log(result)
-        }) 
+        }); 
 
         app.get("/incident", async (req, res) => {
             collection.find({}).toArray((err, result) => {
-                if (err) throw err
+                if (err){
+                    throw err;
+                }
                 //console.log(result)
-                res.send(result)
+                res.send(result);
                 //collection.deleteMany()
                 })
         })
@@ -94,15 +96,15 @@ mongoClient.connect(url, {
                 severity: parseInt(req.body.severity, 10),
                 latitude: parseFloat(req.body.latitude),
                 longitude: parseFloat(req.body.longitude)
-            }
+            };
             /*
             console.log(newIncident.title)
             console.log(newIncident.severity)
             console.log(newIncident.latitude)
             console.log(newIncident.longitude)
             */
-            collection.insertOne(newIncident)
-            res.status(200).send()
+            collection.insertOne(newIncident);
+            res.status(200).send();
         })        
 
         //this function is used exclusively to close the
@@ -110,9 +112,9 @@ mongoClient.connect(url, {
         //Also closes the app.listen port
         app.delete("/incident", async (req, res) => {
             await collection.deleteMany();
-            res.send('database cleared')
-            db.close()
-            server.close()
+            res.send("database cleared");
+            db.close();
+            server.close();
         })
 
     }

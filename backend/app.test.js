@@ -14,37 +14,37 @@ const mongoClient = require("mongodb").MongoClient;
 
 const { expect } = require("@jest/globals");
 
-const App = require('./app');
-const supertest = require('supertest')
-const request = supertest(App)
+const App = require("./app");
+const supertest = require("supertest");
+const request = supertest(App);
 
-describe("Simple test", () =>{
+describe("Simple test", () => {
     let connection;
     let db;
     let server;
     let agent;
     
-    beforeAll(async ()=> {
+    beforeAll(async () => {
         
         connection = await mongoClient.connect("mongodb://localhost:27017");
         //db = await connection.db(global.__MONGO_DB_NAME__);
 
     });
 
-    afterAll(async done=> {
+    afterAll(async (done) => {
         
         await connection.close(done);
         
         //await global.__MONGOD__.stop();
     });
     
-    beforeEach(async ()=> {
-        
-    })
+    beforeEach(async () => {
+        //to be added once more tests are implemented
+    });
 
-    afterEach( async ()=> {
-    
-    })
+    afterEach( async () => {
+        //to be added once more tests are implemented
+    });
 
     const mockincidentlist = jest.fn();
 
@@ -66,25 +66,25 @@ describe("Simple test", () =>{
     
 
     it("should return an array consisting of the mocked incident", 
-        async (done)=>{
+        async (done) => {
         
         //const collection = db.collection('myTable');
 
         //await collection.insertOne(mockincident1);
         
-        var result = await request.post("/incident").send(mockincident1())
+        var result = await request.post("/incident").send(mockincident1());
 
         const mock1 = mockincident1();
         
         //console.log(result);
-        const response = await request.get("/incident")
-        console.log(response.body)
+        const response = await request.get("/incident");
+        //console.log(response.body);
         expect(response.body[0].title).toBe(mock1.title);
         expect(response.body[0].severity).toBe(mock1.severity);
         expect(response.body[0].latitude).toBe(mock1.latitude);
         expect(response.body[0].longitude).toBe(mock1.longitude);
 
-        result = await request.delete("/incident")
+        result = await request.delete("/incident");
         //console.log(mockincidentlist())
         done();
     });
