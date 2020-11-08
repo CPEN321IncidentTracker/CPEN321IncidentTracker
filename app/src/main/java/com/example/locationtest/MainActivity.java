@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private Button mapsButton;
+    private Button eResourcesButton;
     final static String TAG = "MainActivity";
 
     @Override
@@ -33,6 +34,13 @@ public class MainActivity extends AppCompatActivity {
                 checkLocationPermissions();
                 Log.d(TAG, "Trying to open google maps");
             }
+        });
+
+        eResourcesButton = (Button) findViewById(R.id.eResourcesButton);
+        eResourcesButton.setOnClickListener(v -> {
+            Log.d(TAG, "eResources button activated");
+            Intent eResources = new Intent(MainActivity.this, EmergencyResources.class);
+            startActivity(eResources);
         });
     }
 
