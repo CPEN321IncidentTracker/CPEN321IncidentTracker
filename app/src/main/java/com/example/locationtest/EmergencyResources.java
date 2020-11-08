@@ -6,17 +6,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.w3c.dom.Text;
 
 public class EmergencyResources extends AppCompatActivity {
-    private final static String TAG = "EmergencyResourcesActivity";
+    //private final static String TAG = "EmergencyResourcesActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_resources);
-
-        TextView mTextView = (TextView) findViewById(R.id.text);
 
         TextView vpdHomeLink = (TextView) findViewById(R.id.VPD_homepage);
         vpdHomeLink.setMovementMethod(LinkMovementMethod.getInstance());

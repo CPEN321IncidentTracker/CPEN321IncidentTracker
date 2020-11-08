@@ -29,7 +29,7 @@ public class Incident {
         return severity;
     }
 
-    // Calculates great-circle distance between two (lat, long) points using Haversine formula
+    // Calculates great-circle distance (km) between two (lat, long) points using Haversine formula
     public double distanceFrom(LatLng someLocation){
         double p = Math.PI / 180;
         double lat1 = someLocation.latitude;
