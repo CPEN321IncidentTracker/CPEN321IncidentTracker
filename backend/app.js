@@ -1,8 +1,8 @@
-const express = require('express')
-const { read } = require('fs')
+const express = require("express");
+const { read } = require('fs');
 const app = express()
 const mongoClient = require('mongodb').MongoClient
-const url = "mongodb://localhost:27017"
+const url = "mongodb://localhost:27017";
 //const url = "mongodb://localhost:27017/app"
 
 app.use(express.json()) //enable json parsing
@@ -13,7 +13,7 @@ const server = app.listen(3000, () => {
 module.exports = server;
 
 var myDb
-var collection
+var collection;
 
 mongoClient.connect(url, {
     useNewUrlParser : true,
@@ -23,7 +23,7 @@ mongoClient.connect(url, {
     if (err) {
         console.log("Error while connecting mongo client")
     } else {
-        myDb = db.db('myDb')
+        myDb = db.db("myDb")
         collection = myDb.collection('myTable')
 
         /*const listOfIncidents = {incidentList : [
@@ -72,11 +72,13 @@ mongoClient.connect(url, {
 
 */
         collection.find({}).toArray((err, result) => {
-            if (err) throw err
+            if (err){
+                throw err;
+            }
             //console.log(result)
         }) 
 
-        app.get('/incident', async (req, res) => {
+        app.get("/incident", async (req, res) => {
             collection.find({}).toArray((err, result) => {
                 if (err) throw err
                 //console.log(result)
@@ -85,11 +87,11 @@ mongoClient.connect(url, {
                 })
         })
         
-        app.post('/incident', async (req, res) => {
+        app.post("/incident", async (req, res) => {
 
             const newIncident = {
                 title: req.body.title,
-                severity: parseInt(req.body.severity),
+                severity: parseInt(req.body.severity, 10),
                 latitude: parseFloat(req.body.latitude),
                 longitude: parseFloat(req.body.longitude)
             }
@@ -106,8 +108,8 @@ mongoClient.connect(url, {
         //this function is used exclusively to close the
         //database connection and clearing it for testing
         //Also closes the app.listen port
-        app.delete('/incident', async (req, res) => {
-            await collection.deleteMany()
+        app.delete("/incident", async (req, res) => {
+            await collection.deleteMany();
             res.send('database cleared')
             db.close()
             server.close()
