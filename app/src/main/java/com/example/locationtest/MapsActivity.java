@@ -31,13 +31,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.GeoApiContext;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import okhttp3.internal.Util;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,18 +45,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
-    private UiSettings mUiSettings;
-    private LocationManager locationManager;
-    private String BASE_URL = "http://52.149.135.175:80";
-    final static String TAG = "MapActivity";
-    private Button returnHomeButton;
-    private Button safetyScoreButton;
-    private Button postNewIncidentButton;
+    private static final String BASE_URL = "http://52.149.135.175:80";
+    private final static String TAG = "MapActivity";
+    private final static double nearbyDistance = 4; //km
     public List<Incident> incidents = new LinkedList<>();
     private LatLng myLocation;
     private Marker blueMarker;
-    private static double standardizedDistance = 2; //kilometers
-    private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
 
 
@@ -76,24 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                String result = searchView.getQuery().toString();
-                List<Address> addressList = null;
-
-                if (result != null || !result.equals("")){
-                    Geocoder geocoder = new Geocoder(MapsActivity.this);
-                    try {
-                        addressList = geocoder.getFromLocationName(result, 1);
-                        Address address = addressList.get(0);
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        blueMarker.setPosition(latLng);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
-                return false;
+                return getQueryResult(searchView);
             }
 
             @Override
@@ -104,7 +79,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         // Initialize home button
-        returnHomeButton = findViewById(R.id.returnHomeButton);
+        Button returnHomeButton = findViewById(R.id.returnHomeButton);
         returnHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,45 +89,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         // Initialize Safety Score Button
-        safetyScoreButton = findViewById(R.id.getSafetyScoreButton);
+        Button safetyScoreButton = findViewById(R.id.getSafetyScoreButton);
         safetyScoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                double score = 0;
-                int nearbyIncidents = 0;
-
-                // Safety score calculation
-                for (Incident i : incidents) {
-                    double distance = i.distanceFrom(blueMarker.getPosition());
-                    double result = 0;
-                    nearbyIncidents += 1;
-                    if (distance < 5) {
-                        result = 5.0 * (i.getSeverity()) / 5.0;
-                    } else if (distance < 7) {
-                        result = 4.0 * (i.getSeverity()) / 5.0;
-                    } else if (distance < 9) {
-                        result = 3.0 * (i.getSeverity()) / 5.0;
-                    } else {
-                        result = 0.0;
-                        nearbyIncidents -= 1;
-                    }
-                    score += result;
-                }
-
-                if (nearbyIncidents == 0) {
-                    score = 5;
-                } else {
-                    score = score / nearbyIncidents;
-
-                }
-
-                Toast.makeText(MapsActivity.this, "The safety score at this location is " + score, Toast.LENGTH_LONG).show();
+                computeSafetyScore();
             }
         });
 
         // Initialize Post New Incident Button
-        postNewIncidentButton = findViewById(R.id.addIncidentButton);
+        Button postNewIncidentButton = findViewById(R.id.addIncidentButton);
         postNewIncidentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,7 +111,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         // Initialize retrofit objects
-        retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -190,7 +136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         // Initialize Location Manager; request location update every second
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -202,6 +148,58 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+    }
+
+    private boolean getQueryResult(SearchView searchView) {
+        String result = searchView.getQuery().toString();
+        List<Address> addressList = null;
+
+        if (result != null && !result.equals("")){
+            Geocoder geocoder = new Geocoder(MapsActivity.this);
+            try {
+                addressList = geocoder.getFromLocationName(result, 1);
+                Address address = addressList.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                blueMarker.setPosition(latLng);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return false;
+    }
+
+    private void computeSafetyScore() {
+        int score = 0;
+        String isSafe = "";
+        int nearbyIncidents = 0;
+
+        // Safety score calculation
+        for (Incident i : incidents) {
+            double distance = i.distanceFrom(blueMarker.getPosition());
+            if (distance < nearbyDistance) {
+                nearbyIncidents+=1;
+            }
+        }
+
+        if (nearbyIncidents >= 10) {
+            score = 1;
+            isSafe = "(Unsafe)";
+        } else if (nearbyIncidents >= 7) {
+            score = 2;
+        } else if (nearbyIncidents >= 4) {
+            score = 3;
+        } else if (nearbyIncidents >= 1) {
+            score = 4;
+            isSafe = "(Safe)";
+        } else {
+            score = 5;
+            isSafe = "(Very Safe)";
+        }
+
+        String toPrint = "The safety score at this location is: " + score + "/5 " + isSafe;
+        Toast.makeText(MapsActivity.this, toPrint, Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -228,7 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.setMyLocationEnabled(true);
 
-        mUiSettings = mMap.getUiSettings();
+        UiSettings mUiSettings = mMap.getUiSettings();
         mUiSettings.setAllGesturesEnabled(true);
         mUiSettings.setZoomControlsEnabled(true);
         mUiSettings.setMyLocationButtonEnabled(true);
@@ -282,17 +280,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDragStart(Marker marker) {
-
+                blueMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             }
 
             @Override
             public void onMarkerDrag(Marker marker) {
-
+                blueMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             }
 
             @Override
             public void onMarkerDragEnd(Marker marker) {
-
+                blueMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             }
         });
         mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
@@ -306,19 +304,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(@NonNull String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(@NonNull String provider) {
-
-    }
 
 }

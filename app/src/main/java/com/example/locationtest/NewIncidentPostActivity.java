@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -22,16 +21,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NewIncidentPostActivity extends AppCompatActivity {
 
-    private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
-    private String BASE_URL = "http://52.149.135.175:80";
+    private static final String BASE_URL = "http://52.149.135.175:80";
     private LatLng location;
     private EditText incidentTitleEntry;
     private EditText incidentSeverityEntry;
-    private Button submitButton;
-    private Button cancelButton;
-    private String incidentTitle;
-    private int incidentSeverity;
 
 
     @Override
@@ -49,7 +43,7 @@ public class NewIncidentPostActivity extends AppCompatActivity {
         }
 
         // Instantiate retrofit objects
-        retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         retrofitInterface = retrofit.create(RetrofitInterface.class);
@@ -57,14 +51,14 @@ public class NewIncidentPostActivity extends AppCompatActivity {
         // Instantiate text entries and buttons
         incidentTitleEntry = findViewById(R.id.incidentTitleEntry);
         incidentSeverityEntry = findViewById(R.id.incidentSeverityEntry);
-        submitButton = findViewById(R.id.submitButton);
-        cancelButton = findViewById(R.id.cancelButton);
+        Button submitButton = findViewById(R.id.submitButton);
+        Button cancelButton = findViewById(R.id.cancelButton);
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                incidentSeverity = Integer.parseInt(incidentSeverityEntry.getText().toString());
-                incidentTitle = incidentTitleEntry.getText().toString();
+                int incidentSeverity = Integer.parseInt(incidentSeverityEntry.getText().toString());
+                String incidentTitle = incidentTitleEntry.getText().toString();
 
                 // Hashmap to be sent to server
                 HashMap<String, String> map = new HashMap<>();
