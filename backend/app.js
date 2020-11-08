@@ -24,7 +24,7 @@ mongoClient.connect(url, {
     },(err, db) => {
 
     if (err) {
-        console.log("Error while connecting mongo client");
+        //console.log("Error while connecting mongo client");
     } else {
         myDb = db.db("myDb");
         collection = myDb.collection("myTable");
@@ -90,7 +90,7 @@ mongoClient.connect(url, {
                 res.send(result);
                 //collection.deleteMany()
                 });
-        })
+        });
         
         app.post("/incident", async (req, res) => {
 
