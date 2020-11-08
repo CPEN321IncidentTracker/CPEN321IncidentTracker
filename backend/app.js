@@ -108,7 +108,7 @@ mongoClient.connect(url, {
             */
             collection.insertOne(newIncident);
             res.status(200).send();
-        })        
+        });        
 
         //this function is used exclusively to close the
         //database connection and clearing it for testing
@@ -118,10 +118,10 @@ mongoClient.connect(url, {
             res.send("database cleared");
             db.close();
             server.close();
-        })
+        });
 
     }
-})
+});
 
 
 
