@@ -31,13 +31,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.GeoApiContext;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import okhttp3.internal.Util;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,18 +45,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
-    private UiSettings mUiSettings;
-    private LocationManager locationManager;
     private String BASE_URL = "http://52.149.135.175:80";
-    final static String TAG = "MapActivity";
-    private Button returnHomeButton;
-    private Button safetyScoreButton;
-    private Button postNewIncidentButton;
+    private final static String TAG = "MapActivity";
     public List<Incident> incidents = new LinkedList<>();
     private LatLng myLocation;
     private Marker blueMarker;
-    private static double standardizedDistance = 2; //kilometers
-    private Retrofit retrofit;
     private RetrofitInterface retrofitInterface;
 
 
@@ -79,7 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String result = searchView.getQuery().toString();
                 List<Address> addressList = null;
 
-                if (result != null || !result.equals("")){
+                if (result != null && !result.equals("")){
                     Geocoder geocoder = new Geocoder(MapsActivity.this);
                     try {
                         addressList = geocoder.getFromLocationName(result, 1);
@@ -104,7 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         // Initialize home button
-        returnHomeButton = findViewById(R.id.returnHomeButton);
+        Button returnHomeButton = findViewById(R.id.returnHomeButton);
         returnHomeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,7 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         // Initialize Safety Score Button
-        safetyScoreButton = findViewById(R.id.getSafetyScoreButton);
+        Button safetyScoreButton = findViewById(R.id.getSafetyScoreButton);
         safetyScoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,7 +143,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         // Initialize Post New Incident Button
-        postNewIncidentButton = findViewById(R.id.addIncidentButton);
+        Button postNewIncidentButton = findViewById(R.id.addIncidentButton);
         postNewIncidentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,7 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         // Initialize retrofit objects
-        retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -190,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         // Initialize Location Manager; request location update every second
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -228,7 +219,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         mMap.setMyLocationEnabled(true);
 
-        mUiSettings = mMap.getUiSettings();
+        UiSettings mUiSettings = mMap.getUiSettings();
         mUiSettings.setAllGesturesEnabled(true);
         mUiSettings.setZoomControlsEnabled(true);
         mUiSettings.setMyLocationButtonEnabled(true);
@@ -282,17 +273,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDragStart(Marker marker) {
-
+                blueMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             }
 
             @Override
             public void onMarkerDrag(Marker marker) {
-
+                blueMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             }
 
             @Override
             public void onMarkerDragEnd(Marker marker) {
-
+                blueMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             }
         });
         mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
@@ -306,19 +297,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(@NonNull String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(@NonNull String provider) {
-
-    }
 
 }

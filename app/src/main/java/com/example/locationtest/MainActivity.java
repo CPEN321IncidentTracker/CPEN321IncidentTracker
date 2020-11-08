@@ -16,8 +16,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    private Button mapsButton;
-    private Button eResourcesButton;
     final static String TAG = "MainActivity";
 
     @Override
@@ -27,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Create maps button to open map
-        mapsButton = (Button) findViewById(R.id.maps_button);
+        Button mapsButton = (Button) findViewById(R.id.maps_button);
         mapsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        eResourcesButton = (Button) findViewById(R.id.eResourcesButton);
+        Button eResourcesButton = (Button) findViewById(R.id.eResourcesButton);
         eResourcesButton.setOnClickListener(v -> {
             Log.d(TAG, "eResources button activated");
             Intent eResources = new Intent(MainActivity.this, EmergencyResources.class);
