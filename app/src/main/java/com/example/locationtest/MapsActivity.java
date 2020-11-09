@@ -58,11 +58,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        // Initialize the search bar
         SearchView searchView;
         searchView = findViewById(R.id.sv_location);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -110,21 +114,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        // Initialize retrofit objects
+        // Initialize retrofit interface for HTTP get
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
         retrofitInterface = retrofit.create(RetrofitInterface.class);
 
 
-        // Temporary code to create a list of incidents
-        /*incidents.add(new Incident("Some dude was murdered here", 37.4567,-122.11475,5));
-        incidents.add(new Incident("Robbery", 37.47347, -122.1349, 3));
-        incidents.add(new Incident("Drug Deal :o", 37.4631, -122.13859, 2));*/
-
-        // Add an incident if arriving from submitting an incident
+        // If arriving from submitting an incident, show that incident
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             Double latitude = extras.getDouble("latitude");
@@ -150,6 +148,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
     }
 
+    // Go to the result of search bar query
     private boolean getQueryResult(SearchView searchView) {
         String result = searchView.getQuery().toString();
         List<Address> addressList = null;
@@ -170,19 +169,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return false;
     }
 
+
+    // Calculate the safety score at the blue marker based on number of nearby incidents
     private void computeSafetyScore() {
         int score = 0;
         String isSafe = "";
         int nearbyIncidents = 0;
 
-        // Safety score calculation
+        // Count the number of incidents
         for (Incident i : incidents) {
-            double distance = i.distanceFrom(blueMarker.getPosition());
+            double distance = i.distanceFrom(blueMarker.getPosition()); //Distance from blue marker
             if (distance < nearbyDistance) {
                 nearbyIncidents+=1;
             }
         }
 
+        // Score from 1 to 5
+        // Many incidents -> Low score
+        // No incidents -> High score
         if (nearbyIncidents >= 10) {
             score = 1;
             isSafe = "(Unsafe)";
@@ -198,6 +202,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             isSafe = "(Very Safe)";
         }
 
+        // Show the safety score to the user
         String toPrint = "The safety score at this location is: " + score + "/5 " + isSafe;
         Toast.makeText(MapsActivity.this, toPrint, Toast.LENGTH_LONG).show();
     }
@@ -205,8 +210,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -224,8 +228,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        mMap.setMyLocationEnabled(true);
 
+        // Enable all functionality for map navigation
+        mMap.setMyLocationEnabled(true);
         UiSettings mUiSettings = mMap.getUiSettings();
         mUiSettings.setAllGesturesEnabled(true);
         mUiSettings.setZoomControlsEnabled(true);
@@ -255,6 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     return;
                 }
 
+                // Add incidents from HTTP response
                 incidents.addAll(response.body());
 
                 // Add markers at incidents from server
