@@ -32,7 +32,7 @@ describe("Simple test", () => {
     });
 
     afterAll(async (done) => {
-        
+        await request.delete("/incident");
         await connection.close(done);
         
         //await global.__MONGOD__.stop();
@@ -59,9 +59,9 @@ describe("Simple test", () => {
     mockincident1.mockReturnValue({"title" : "mock1", "severity" : 5, 
                            "latitude" : 37.3631, "longitude" : -122.123});
     const mockincident2 = {"title" : "mock2", "severity" : 4, 
-                           "latitude" : 37.222, "longitude" : -122.321};
+                           "latitude" : 37.3610, "longitude" : -122.121};
     const mockincident3 = {"title" : "mock3", "severity" : 3, 
-                           "latitude" : 37.444, "longitude" : -122.909};
+                           "latitude" : 37.3694, "longitude" : -122.1269};
 
     
 
@@ -84,8 +84,24 @@ describe("Simple test", () => {
         expect(response.body[0].latitude).toBe(mock1.latitude);
         expect(response.body[0].longitude).toBe(mock1.longitude);
 
-        result = await request.delete("/incident");
+        //result = await request.delete("/incident");
         //console.log(mockincidentlist())
+        done();
+    });
+
+    it("should return a score", async (done) => {
+        location = [37.36459, -122.124928];
+
+        //populate the database with some incidents
+
+        //var result = await request.post("/incident").send(mockincident1());
+        var result = await request.post("/incident").send(mockincident2);
+        result = await request.post("/incident").send(mockincident3);
+        result = await request.get("/score/37.36459/-122.124928").send(location);
+        //console.log(result);
+        expect(result.body.score).toBe("4");
+        expect(result.body.isSafe).toBe("safe");
+        
         done();
     });
 });
