@@ -23,11 +23,12 @@ mongoClient.connect(url, {
     useNewUrlParser : true,
     useUnifiedTopology : true,
     },(err, db) => {
-
-    if (err) {
+    
+    
+    //if (err) {
         //console.log("Error while connecting mongo client");
-        throw err;
-    } else {
+        //throw err;
+    //} else {
         myDb = db.db("myDb");
         collection = myDb.collection("myTable");
 
@@ -77,17 +78,21 @@ mongoClient.connect(url, {
 
 */
         collection.find({}).toArray((err, result) => {
+            /*
             if (err){
                 throw err;
             }
+            */
             //console.log(result)
         }); 
 
         app.get("/incident", async (req, res) => {
             collection.find({}).toArray((err, result) => {
+                /*
                 if (err){
                     throw err;
                 }
+                */
                 //console.log(result)
                 res.send(result);
                 //collection.deleteMany()
@@ -96,9 +101,11 @@ mongoClient.connect(url, {
 
         app.get("/score/:latitude/:longitude", async (req, res) => {
             collection.find({}).toArray((err, result) => {
+                /*
                 if (err){
                     throw err;
                 }
+                */
                 var score;
                 //console.log(result)
                 //console.log(req);
@@ -136,7 +143,13 @@ mongoClient.connect(url, {
             server.close();
         });
 
-    }
+        //this function is used to clear the database
+        app.delete("/clear", async (req, res) => {
+            await collection.deleteMany();
+            res.send("database cleared");
+        });
+
+    //}
 });
 
 
