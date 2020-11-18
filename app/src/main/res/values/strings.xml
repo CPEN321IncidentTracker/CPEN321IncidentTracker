@@ -9,6 +9,18 @@
     <string name="get_safety_score">Get safety score</string>
     <string name="title_activity_post_new_incident">PostNewIncidentActivity</string>
 
+    <string-array name="numbers">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+
+    </string-array>
+
+    <string name="error_title_too_short">Incident title must be at least 5 characters</string>
+    <string name="error_title_too_long">Incident title must be less than 50 characters</string>
+
     <string name="emergency_resources_title">Vancouver Police Department and other resources:</string>
     <string name="emergency_resources_subtitle1">Phone numbers:</string>
     <string name="police_fire_ambulance">Police, fire ambulance:</string>
@@ -38,4 +50,5 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="title_activity_emergency_resources">EmergencyResources</string>
+    <string name="incident_description"> </string>
 </resources>

@@ -49,7 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private static final String BASE_URL = "http://52.149.135.175:80";
     private final static String TAG = "MapActivity";
-    private final static double nearbyDistance = 4; //km
+    private final static double nearbyDistance = 8; //km
     public List<Incident> incidents = new LinkedList<>();
     private LatLng myLocation;
     private Marker blueMarker;
@@ -66,6 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
 
         // Initialize the search bar
         SearchView searchView;
@@ -102,6 +103,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                blueMarker.setPosition(latLng);
+            }
+        });
 
         // Enable all functionality for map navigation
         mMap.setMyLocationEnabled(true);
@@ -295,4 +302,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
     }
+
 }
