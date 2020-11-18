@@ -3,6 +3,7 @@ const { read } = require("fs");
 const app = express();
 const mongoClient = require("mongodb").MongoClient;
 const url = "mongodb://localhost:27017";
+const score_calc = require("./safety_score_calculator");
 //const url = "mongodb://localhost:27017/app"
 
 app.use(express.json()); //enable json parsing
@@ -22,10 +23,12 @@ mongoClient.connect(url, {
     useNewUrlParser : true,
     useUnifiedTopology : true,
     },(err, db) => {
-
-    if (err) {
+    
+    
+    //if (err) {
         //console.log("Error while connecting mongo client");
-    } else {
+        //throw err;
+    //} else {
         myDb = db.db("myDb");
         collection = myDb.collection("myTable");
 
@@ -75,22 +78,42 @@ mongoClient.connect(url, {
 
 */
         collection.find({}).toArray((err, result) => {
+            /*
             if (err){
                 throw err;
             }
+            */
             //console.log(result)
         }); 
 
         app.get("/incident", async (req, res) => {
             collection.find({}).toArray((err, result) => {
+                /*
                 if (err){
                     throw err;
                 }
+                */
                 //console.log(result)
                 res.send(result);
                 //collection.deleteMany()
                 });
         });
+
+        app.get("/score/:latitude/:longitude", async (req, res) => {
+            collection.find({}).toArray((err, result) => {
+                /*
+                if (err){
+                    throw err;
+                }
+                */
+                var score;
+                //console.log(result)
+                //console.log(req);
+                score = score_calc.getScore(req.params, result);
+                res.send(score)
+                //collection.deleteMany()
+                });
+        })
         
         app.post("/incident", async (req, res) => {
 
@@ -120,7 +143,13 @@ mongoClient.connect(url, {
             server.close();
         });
 
-    }
+        //this function is used to clear the database
+        app.delete("/clear", async (req, res) => {
+            await collection.deleteMany();
+            res.send("database cleared");
+        });
+
+    //}
 });
 
 
