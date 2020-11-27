@@ -8,18 +8,19 @@ function makescore(nearIncidents){
     } 
     if (nearIncidents >= 7) {
         return {"score": "2", "isSafe": "unsafe"};
-    } else if (nearIncidents >= 4) {
+    } 
+    if (nearIncidents >= 4) {
         return {"score": "3", "isSafe": "somewhat safe"};
-    } else if (nearIncidents >= 1) {
-        return {"score": "4", "isSafe": "safe"};
-    } else {
-        return {"score": "5", "isSafe": "very safe"};
     }
+    if (nearIncidents >= 1) {
+        return {"score": "4", "isSafe": "safe"};
+    }
+    return {"score": "5", "isSafe": "very safe"};
 }
 
 /*This function returns the distance between
   the given location and incident in km*/
-  function getdist(location, incident) {
+function getdist(location, incident) {
     //console.log(location);
     //console.log(incident);
     const mToKm = 0.001;
@@ -27,6 +28,20 @@ function makescore(nearIncidents){
         {latitude: incident.latitude, longitude: incident.longitude}, 1);
     //console.log(dist * mToKm);
     return dist * mToKm;
+}
+
+function valLoc(location) {
+    if ((typeof location == "undefined") ||
+        !(location.hasOwnProperty("latitude") && location.hasOwnProperty("longitude"))) {
+        score = {"score": "-1", "isSafe": "missing latitude or longitude"};
+        return score;
+    }
+
+    if ((typeof location.latitude) != "number" || (typeof location.longitude) != "number") {
+        score = {"score": "-1", "isSafe": "latitude or longitude not numbers"};
+        return score;
+    }
+    return 0;
 }
 
 /*This module takes in a location and array of incidents,
@@ -39,14 +54,8 @@ exports.getScore = function (location, incidents) {
     var nearIncidents = 0;
     //console.log(incidents);
     //console.log(location);
-    if ((typeof location == "undefined") ||
-        !(location.hasOwnProperty("latitude") && location.hasOwnProperty("longitude"))) {
-        score = {"score": "-1", "isSafe": "missing latitude or longitude"};
-        return score;
-    }
-
-    if ((typeof location.latitude) != "number" || (typeof location.longitude) != "number") {
-        score = {"score": "-1", "isSafe": "latitude or longitude not numbers"};
+    score = valLoc(location);
+    if (score) {
         return score;
     }
 

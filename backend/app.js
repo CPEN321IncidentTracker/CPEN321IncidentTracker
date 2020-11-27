@@ -19,11 +19,12 @@ module.exports = server;
 var myDb;
 var collection;
 
+
+
 mongoClient.connect(url, {
     useNewUrlParser : true,
     useUnifiedTopology : true,
     },(err, db) => {
-    
     
     //if (err) {
         //console.log("Error while connecting mongo client");
@@ -32,51 +33,6 @@ mongoClient.connect(url, {
         myDb = db.db("myDb");
         collection = myDb.collection("myTable");
 
-        /*const listOfIncidents = {incidentList : [
-            {
-                title: "Example1",
-                severity: 5,
-                latitude: 37.4567,
-                longitude: -122.11475
-            },
-            {
-                title: "Example2",
-                severity: 3,
-                latitude: 37.47347,
-                longitude: -122.1349
-            },
-            {
-                title: "Example3",
-                severity: 2,
-                latitude: 37.4631,
-                longitude: -122.13859,
-            }
-        ]}
-
-        collection.insertOne(listOfIncidents)*/
-/*
-        collection.insertOne({
-            title: "Example1",
-            severity: 5,
-            latitude: 37.4567,
-            longitude: -122.11475
-        })
-
-        collection.insertOne({
-            title: "Example2",
-            severity: 3,
-            latitude: 37.47347,
-            longitude: -122.1349
-        })
-
-        collection.insertOne({
-            title: "Example3",
-            severity: 2,
-            latitude: 37.4631,
-            longitude: -122.13859,
-        })
-
-*/
         collection.find({}).toArray((err, result) => {
             /*
             if (err){
@@ -90,10 +46,9 @@ mongoClient.connect(url, {
             collection.find({}).toArray((err, result) => {
                 if (result.length === 0) {
                     res.status(201).send(result);
+                    return;
                 }
-                else {
-                    res.send(result);
-                }
+                res.send(result);
                 });
         });
 
@@ -118,10 +73,8 @@ mongoClient.connect(url, {
                         res.status(402).send();
                         return;
                     }
-                    else {
-                        res.status(401).send();
-                        return;
-                    }
+                    res.status(401).send();
+                    return;
                 } 
                 res.send(score);
                 //collection.deleteMany()
