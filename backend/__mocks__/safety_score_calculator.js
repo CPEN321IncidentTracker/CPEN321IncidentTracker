@@ -6,7 +6,7 @@ exports.getScore = function (location, incidents) {
         score = {"score": "-1", "isSafe": "missing latitude or longitude"};
         return score;
     }
-    if ((typeof location.latitude) != "number" || (typeof location.longitude) != "number") {
+    else if ((typeof location.latitude) != "number" || (typeof location.longitude) != "number") {
         score = {"score": "-1", "isSafe": "latitude or longitude not numbers"};
         return score;
     }

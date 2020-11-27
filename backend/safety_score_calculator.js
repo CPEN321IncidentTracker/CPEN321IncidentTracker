@@ -33,13 +33,11 @@ function getdist(location, incident) {
 function valLoc(location) {
     if ((typeof location == "undefined") ||
         !(location.hasOwnProperty("latitude") && location.hasOwnProperty("longitude"))) {
-        score = {"score": "-1", "isSafe": "missing latitude or longitude"};
-        return score;
+        return {"score": "-1", "isSafe": "missing latitude or longitude"};
     }
 
-    if ((typeof location.latitude) != "number" || (typeof location.longitude) != "number") {
-        score = {"score": "-1", "isSafe": "latitude or longitude not numbers"};
-        return score;
+    else if ((typeof location.latitude) != "number" || (typeof location.longitude) != "number") {
+        return {"score": "-1", "isSafe": "latitude or longitude not numbers"};
     }
     return 0;
 }
