@@ -4,13 +4,13 @@ const geolib = require("geolib");
   determines how many incidents are near the given location,
   and returns an object with a score and safety fields*/
 exports.getScore = function (location, incidents) {
-    const near_dist = 4;
+    const nearDist = 8;
     var incident;
     var score;
-    var near_incidents = 0;
+    var nearIncidents = 0;
     //console.log(incidents);
     //console.log(location);
-    if ((typeof location == undefined) ||
+    if ((typeof location == "undefined") ||
         !(location.hasOwnProperty("latitude") && location.hasOwnProperty("longitude"))) {
         score = {"score": "-1", "isSafe": "missing latitude or longitude"};
         return score;
@@ -26,17 +26,22 @@ exports.getScore = function (location, incidents) {
             score = {"score": "-1", "isSafe": "missing latitude or longitude"};
             return score;
         }
-        else if (getdist(location, incident) <= near_dist) {
-            near_incidents++;
+        else if (getdist(location, incident) <= nearDist) {
+            nearIncidents++;
         }
     }
-    if (near_incidents >= 10) {
+    score = makescore(nearIncidents);
+    return score;
+};
+
+function makescore(nearIncidents){
+    if (nearIncidents >= 10) {
         score = {"score": "1", "isSafe": "very unsafe"};
-    } else if (near_incidents >= 7) {
+    } else if (nearIncidents >= 7) {
         score = {"score": "2", "isSafe": "unsafe"};
-    } else if (near_incidents >= 4) {
+    } else if (nearIncidents >= 4) {
         score = {"score": "3", "isSafe": "somewhat safe"};
-    } else if (near_incidents >= 1) {
+    } else if (nearIncidents >= 1) {
         score = {"score": "4", "isSafe": "safe"};
     } else {
         score = {"score": "5", "isSafe": "very safe"};

@@ -3,7 +3,7 @@ const { read } = require("fs");
 const app = express();
 const mongoClient = require("mongodb").MongoClient;
 const url = "mongodb://localhost:27017";
-const score_calc = require("./safety_score_calculator");
+const scoreCalc = require("./safety_score_calculator");
 //const url = "mongodb://localhost:27017/app"
 
 app.use(express.json()); //enable json parsing
@@ -88,12 +88,10 @@ mongoClient.connect(url, {
 
         app.get("/incident", async (req, res) => {
             collection.find({}).toArray((err, result) => {
-                if (result.length == 0) {
+                if (result.length === 0) {
                     res.status(201).send(result);
                 }
-                else {
-                    res.send(result);
-                }
+                else res.send(result);
                 });
         });
 
@@ -102,18 +100,18 @@ mongoClient.connect(url, {
                 var score;
                 //console.log(result)
                 //console.log(req.params);
-                if (!isNaN(Number(req.params.latitude)) && !isNaN(Number(req.params.latitude)) != NaN) {
-                    var latitude = parseFloat(req.params.latitude);
-                    var longitude = parseFloat(req.params.longitude);
-                    var location = {latitude: latitude, longitude: longitude};
-                    score = score_calc.getScore(location, result);
+                if (!isNaN(Number(req.params.latitude)) && !isNaN(Number(req.params.latitude))) {
+                    var lat = parseFloat(req.params.latitude);
+                    var long = parseFloat(req.params.longitude);
+                    var location = {latitude: lat, longitude: long};
+                    score = scoreCalc.getScore(location, result);
                 }
                 else {
-                    score = score_calc.getScore(req.params, result);
+                    score = scoreCalc.getScore(req.params, result);
                 }
                 //console.log(score);
 
-                if (score.score == -1){
+                if (score.score === "-1"){
                     if (score.isSafe.localeCompare("missing latitude or longitude")){
                         res.status(402).send();
                     }
@@ -126,7 +124,7 @@ mongoClient.connect(url, {
                 }
                 //collection.deleteMany()
                 });
-        })
+        });
         
         app.post("/incident", async (req, res) => {
 
@@ -163,7 +161,7 @@ mongoClient.connect(url, {
         //also closes the app.listen port.
         //it shuts down the server and should not be
         //called from the frontend.
-        app.delete("/incident", async (req, res) => {
+        app.delete("/shutdown", async (req, res) => {
             await collection.deleteMany();
             res.send("database cleared");
             db.close();

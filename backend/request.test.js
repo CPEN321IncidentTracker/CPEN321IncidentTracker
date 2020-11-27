@@ -29,7 +29,7 @@ describe("Test request handler", () => {
     mockincident1.mockReturnValue({"title" : "mock1", "severity" : 5, 
                            "latitude" : 37.3631, "longitude" : -122.123});
     const mockincident2 = {"title" : "mock2", "severity" : 4, 
-                           "latitude" : 37.3610, "longitude" : -122.121};
+                           "latitude" : 37.361, "longitude" : -122.121};
     const mockincident3 = {"title" : "mock3", "severity" : 3, 
                            "latitude" : 37.3694, "longitude" : -122.1269};
     const malIncident1 = {"title" : "mal1", "severity" : 3.9, 
@@ -39,7 +39,7 @@ describe("Test request handler", () => {
     const malIncident3 = {"title" : "mal3", "severity" : 2};
 
     afterAll(async (done) => {
-        await request.delete("/incident");
+        await request.delete("/shutdown");
         await connection.close(done);
         //await global.__MONGOD__.stop();
     });
@@ -114,12 +114,12 @@ describe("Test request handler", () => {
         const response = await request.get("/score/BAD/BAD");
         expect(response.status).toBe(402);
         done();
-    })
+    });
 
     it("test get score with no longitude/latitude", async (done) => {
         const response = await request.get("/score");
         expect(response.status).toBe(404);
         done();
-    })
+    });
 
 });

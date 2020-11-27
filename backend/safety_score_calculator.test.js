@@ -3,7 +3,7 @@
 
 describe("safety score calculator tests", () => {
     var scoreCalc = require("./safety_score_calculator");
-    jest.unmock("./safety_score_calculator")
+    jest.unmock("./safety_score_calculator");
     const location = {latitude: 100, longitude: 100};
     var score;
 

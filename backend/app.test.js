@@ -24,7 +24,7 @@ describe("Integration tests", () => {
 
     beforeAll(async () => {
         connection = await mongoClient.connect("mongodb://localhost:27017");
-        db = await connection.db(global.__MONGO_DB_NAME__);
+        //db = await connection.db(global.__MONGO_DB_NAME__);
 
     });
 
@@ -41,7 +41,7 @@ describe("Integration tests", () => {
     mockincident1.mockReturnValue({"title" : "mock1", "severity" : 5, 
                            "latitude" : 37.3631, "longitude" : -122.123});
     const mockincident2 = {"title" : "mock2", "severity" : 4, 
-                           "latitude" : 37.3610, "longitude" : -122.121};
+                           "latitude" : 37.361, "longitude" : -122.121};
     const mockincident3 = {"title" : "mock3", "severity" : 3, 
                            "latitude" : 37.3694, "longitude" : -122.1269};
     const malIncident1 = {"title" : "mal1", "severity" : 3.9, 
@@ -51,7 +51,7 @@ describe("Integration tests", () => {
     const malIncident3 = {"title" : "mal3", "severity" : 2};
 
     afterAll(async (done) => {
-        await request.delete("/incident");
+        await request.delete("/shutdown");
         await connection.close(done);
         
         //await global.__MONGOD__.stop();
