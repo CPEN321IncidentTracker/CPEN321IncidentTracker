@@ -1,8 +1,11 @@
 package com.example.locationtest;
 
 
+import android.os.Handler;
+
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.filters.FlakyTest;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
 import org.junit.Rule;
@@ -22,8 +25,10 @@ public class EspressoButtonTest {
     @Test
     public void testMapButton() {
         onView(withId(R.id.maps_button)).perform(ViewActions.click());
-
         onView(withId(R.id.mapLayout)).check(matches(isDisplayed()));
+
+        onView(withId(R.id.returnHomeButton)).perform(ViewActions.click());
+        onView(withId(R.id.activity_main)).check(matches(isDisplayed()));
 
     }
 }

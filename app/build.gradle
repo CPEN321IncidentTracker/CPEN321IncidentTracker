@@ -6,6 +6,15 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
+
+    applicationVariants.all {variant ->
+        variant.getRuntimeConfiguration().exclude group: 'com.squareup.okhttp3', module: 'jetified'
+    }
+
+    applicationVariants.all {variant ->
+        variant.getRuntimeConfiguration().exclude group: 'java-client', module: 'jetified'
+    }
+
     defaultConfig {
         applicationId "com.example.locationtest"
         minSdkVersion 29
@@ -38,8 +47,17 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:17.1.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'androidx.preference:preference:1.1.1'
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    testImplementation 'junit:junit:4.+'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.2'
+    implementation files('src/libs/byte-buddy-1.8.15.jar')
+    implementation files('src/libs/client-combined-3.141.59.jar')
+    implementation files('src/libs/client-combined-3.141.59-sources.jar')
+    implementation files('src/libs/commons-exec-1.3.jar')
+    implementation files('src/libs/guava-25.0-jre.jar')
+    implementation files('src/libs/java-client-7.3.0.jar')
+    implementation files('src/libs/commons-lang3-3.11.jar')
+    //implementation files('src/libs/okhttp-3.11.0.jar')
+    //implementation files('src/libs/okio-1.14.0.jar')
+    testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'androidx.test:runner:1.3.0'
