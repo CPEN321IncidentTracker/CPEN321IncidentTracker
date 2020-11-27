@@ -1,6 +1,35 @@
 const geolib = require("geolib");
 
-/*This module takes in a locatin and array of incidents,
+/*This function takes in a number of near incidents
+  and returns a score according to the number of incidents*/
+function makescore(nearIncidents){
+    if (nearIncidents >= 10) {
+        return {"score": "1", "isSafe": "very unsafe"};
+    } 
+    if (nearIncidents >= 7) {
+        return {"score": "2", "isSafe": "unsafe"};
+    } else if (nearIncidents >= 4) {
+        return {"score": "3", "isSafe": "somewhat safe"};
+    } else if (nearIncidents >= 1) {
+        return {"score": "4", "isSafe": "safe"};
+    } else {
+        return {"score": "5", "isSafe": "very safe"};
+    }
+}
+
+/*This function returns the distance between
+  the given location and incident in km*/
+  function getdist(location, incident) {
+    //console.log(location);
+    //console.log(incident);
+    const mToKm = 0.001;
+    var dist = geolib.getDistance(location, 
+        {latitude: incident.latitude, longitude: incident.longitude}, 1);
+    //console.log(dist * mToKm);
+    return dist * mToKm;
+}
+
+/*This module takes in a location and array of incidents,
   determines how many incidents are near the given location,
   and returns an object with a score and safety fields*/
 exports.getScore = function (location, incidents) {
@@ -34,29 +63,3 @@ exports.getScore = function (location, incidents) {
     return score;
 };
 
-function makescore(nearIncidents){
-    if (nearIncidents >= 10) {
-        score = {"score": "1", "isSafe": "very unsafe"};
-    } else if (nearIncidents >= 7) {
-        score = {"score": "2", "isSafe": "unsafe"};
-    } else if (nearIncidents >= 4) {
-        score = {"score": "3", "isSafe": "somewhat safe"};
-    } else if (nearIncidents >= 1) {
-        score = {"score": "4", "isSafe": "safe"};
-    } else {
-        score = {"score": "5", "isSafe": "very safe"};
-    }
-    return score;
-}
-
-/*This function returns the distance between
-  the given location and incident in km*/
-function getdist(location, incident) {
-    //console.log(location);
-    //console.log(incident);
-    const mToKm = 0.001;
-    var dist = geolib.getDistance(location, 
-        {latitude: incident.latitude, longitude: incident.longitude}, 1);
-    //console.log(dist * mToKm);
-    return dist * mToKm;
-}

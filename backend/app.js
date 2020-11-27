@@ -91,7 +91,9 @@ mongoClient.connect(url, {
                 if (result.length === 0) {
                     res.status(201).send(result);
                 }
-                else res.send(result);
+                else {
+                    res.send(result);
+                }
                 });
         });
 
@@ -114,14 +116,14 @@ mongoClient.connect(url, {
                 if (score.score === "-1"){
                     if (score.isSafe.localeCompare("missing latitude or longitude")){
                         res.status(402).send();
+                        return;
                     }
                     else {
                         res.status(401).send();
+                        return;
                     }
                 } 
-                else {
-                    res.send(score);
-                }
+                res.send(score);
                 //collection.deleteMany()
                 });
         });
@@ -130,15 +132,18 @@ mongoClient.connect(url, {
 
             if (!Number.isInteger(req.body.severity)) {
                 res.status(401).send();
+                return;
             }
-            else if (!(req.body.hasOwnProperty("latitude") && req.body.hasOwnProperty("longitude"))){
+            if (!(req.body.hasOwnProperty("latitude") && req.body.hasOwnProperty("longitude"))){
                 res.status(403).send();
+                return;
             }
-            else if ((typeof req.body.latitude != "number") || 
+            if ((typeof req.body.latitude != "number") || 
                      (typeof req.body.longitude != "number")) {
                 res.status(402).send();
+                return;
             }
-            else {
+            //else {
                 const newIncident = {
                     title: req.body.title,
                     severity: parseInt(req.body.severity, 10),
@@ -153,7 +158,7 @@ mongoClient.connect(url, {
             */
                 collection.insertOne(newIncident);
                 res.status(200).send();
-            }
+            //}
         });        
 
         //this function is used to close the

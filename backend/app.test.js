@@ -137,12 +137,12 @@ describe("Integration tests", () => {
         const response = await request.get("/score/BAD/BAD");
         expect(response.status).toBe(402);
         done();
-    })
+    });
 
     it("test get score with no longitude/latitude", async (done) => {
         const response = await request.get("/score");
         expect(response.status).toBe(404);
         done();
-    })
+    });
     
 });
