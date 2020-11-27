@@ -1,15 +1,3 @@
-//installs:
-//npm install --save-dev jest
-//npm install supertest --save-dev supertest
-//npm install @shelf/jest-mongodb --dev
-//npm install mongodb-memory-server --save-dev
-//npm install mongodb-memory-server-core --save-dev
-
-/*
-const {MongoMemoryServer} = require('mongodb-memory-server');
-const jestMongodbConfig =  require('./jest-mongodb-config');
-const mongod = new MongoMemoryServer();
-*/
 const mongoClient = require("mongodb").MongoClient;
 
 const { expect } = require("@jest/globals");
@@ -20,12 +8,12 @@ const request = supertest(App);
 
 var connection;
 
-describe("Integration tests", () => {    
+jest.mock("./safety_score_calculator");
 
+describe("Test request handler", () => {
+    
     beforeAll(async () => {
         connection = await mongoClient.connect("mongodb://localhost:27017");
-        db = await connection.db(global.__MONGO_DB_NAME__);
-
     });
 
     const mockincidentlist = jest.fn();
@@ -53,7 +41,6 @@ describe("Integration tests", () => {
     afterAll(async (done) => {
         await request.delete("/incident");
         await connection.close(done);
-        
         //await global.__MONGOD__.stop();
     });
     
@@ -64,7 +51,7 @@ describe("Integration tests", () => {
     afterEach( async () => {
         await request.delete("/clear");
     });
-    
+
     it("should post and get the single mocked incident successfully", 
         async (done) => {
         
@@ -86,15 +73,14 @@ describe("Integration tests", () => {
         //console.log(mockincidentlist())
         done();
     });
-    
-    
+
     it("test posting incident with malformed severity",
         async (done) => {
         const response = await request.post("/incident").send(malIncident1);
         expect(response.status).toBe(401);
         done();
     });
-    
+
     it("test posting incident with malformed latitude, longitude",
         async (done) => {
         const response = await request.post("/incident").send(malIncident2);
@@ -108,31 +94,22 @@ describe("Integration tests", () => {
         expect(response.status).toBe(403);
         done();
     });
-    
-    
+
     it("test get incident with an empty database", async (done) => {
         const response = await request.get("/incident");
         expect(response.status).toBe(201);
         done();
     });
-    
-    
-    it("test getting a score", async (done) => {
-        // reference location = [37.36459, -122.124928];
 
-        //populate the database with some incidents
-
-        //var result = await request.post("/incident").send(mockincident1());
-        var result = await request.post("/incident").send(mockincident2);
-        result = await request.post("/incident").send(mockincident3);
-        result = await request.get("/score/37.36459/-122.124928").send(location);
-        //console.log(result);
-        expect(result.body.score).toBe("4");
-        expect(result.body.isSafe).toBe("safe");
-        expect(result.status).toBe(200);
+    it("test getting score", async (done) => {
+        
+        const response = await request.get("/score/123.123/-321.321");
+        expect(response.body.score).toBe("3");
+        expect(response.body.isSafe).toBe("somewhat safe");
+        expect(response.status).toBe(200);
         done();
     });
-    
+
     it("test get score with malformed longitude/latitude", async (done) => {
         const response = await request.get("/score/BAD/BAD");
         expect(response.status).toBe(402);
@@ -144,5 +121,5 @@ describe("Integration tests", () => {
         expect(response.status).toBe(404);
         done();
     })
-    
+
 });

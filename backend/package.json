@@ -15,7 +15,9 @@
     "test:watch": "jest --watch",
     "test:detectOpenHandles": "jest --detectOpenHandles",
     "test:coverage": "jest --coverage",
-    "test:runInBand": "jest --runInBand"
+    "test:runInBand": "jest --runInBand",
+    "test:score": "jest -t safety-score-calculator-tests",
+    "test:coverageInBand": "jest --coverage --runInBand"
   },
   "devDependencies": {
     "jest": "^26.6.1",

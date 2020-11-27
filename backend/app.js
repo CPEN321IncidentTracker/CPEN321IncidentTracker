@@ -88,54 +88,81 @@ mongoClient.connect(url, {
 
         app.get("/incident", async (req, res) => {
             collection.find({}).toArray((err, result) => {
-                /*
-                if (err){
-                    throw err;
+                if (result.length == 0) {
+                    res.status(201).send(result);
                 }
-                */
-                //console.log(result)
-                res.send(result);
-                //collection.deleteMany()
+                else {
+                    res.send(result);
+                }
                 });
         });
 
         app.get("/score/:latitude/:longitude", async (req, res) => {
             collection.find({}).toArray((err, result) => {
-                /*
-                if (err){
-                    throw err;
-                }
-                */
                 var score;
                 //console.log(result)
-                //console.log(req);
-                score = score_calc.getScore(req.params, result);
-                res.send(score)
+                //console.log(req.params);
+                if (!isNaN(Number(req.params.latitude)) && !isNaN(Number(req.params.latitude)) != NaN) {
+                    var latitude = parseFloat(req.params.latitude);
+                    var longitude = parseFloat(req.params.longitude);
+                    var location = {latitude: latitude, longitude: longitude};
+                    score = score_calc.getScore(location, result);
+                }
+                else {
+                    score = score_calc.getScore(req.params, result);
+                }
+                //console.log(score);
+
+                if (score.score == -1){
+                    if (score.isSafe.localeCompare("missing latitude or longitude")){
+                        res.status(402).send();
+                    }
+                    else {
+                        res.status(401).send();
+                    }
+                } 
+                else {
+                    res.send(score);
+                }
                 //collection.deleteMany()
                 });
         })
         
         app.post("/incident", async (req, res) => {
 
-            const newIncident = {
-                title: req.body.title,
-                severity: parseInt(req.body.severity, 10),
-                latitude: parseFloat(req.body.latitude),
-                longitude: parseFloat(req.body.longitude)
-            };
+            if (!Number.isInteger(req.body.severity)) {
+                res.status(401).send();
+            }
+            else if (!(req.body.hasOwnProperty("latitude") && req.body.hasOwnProperty("longitude"))){
+                res.status(403).send();
+            }
+            else if ((typeof req.body.latitude != "number") || 
+                     (typeof req.body.longitude != "number")) {
+                res.status(402).send();
+            }
+            else {
+                const newIncident = {
+                    title: req.body.title,
+                    severity: parseInt(req.body.severity, 10),
+                    latitude: parseFloat(req.body.latitude),
+                    longitude: parseFloat(req.body.longitude)
+                };
             /*
             console.log(newIncident.title)
             console.log(newIncident.severity)
             console.log(newIncident.latitude)
             console.log(newIncident.longitude)
             */
-            collection.insertOne(newIncident);
-            res.status(200).send();
+                collection.insertOne(newIncident);
+                res.status(200).send();
+            }
         });        
 
-        //this function is used exclusively to close the
-        //database connection and clearing it for testing
-        //Also closes the app.listen port
+        //this function is used to close the
+        //database connection and clear it,
+        //also closes the app.listen port.
+        //it shuts down the server and should not be
+        //called from the frontend.
         app.delete("/incident", async (req, res) => {
             await collection.deleteMany();
             res.send("database cleared");
@@ -144,6 +171,7 @@ mongoClient.connect(url, {
         });
 
         //this function is used to clear the database
+        //The front end should not call this function
         app.delete("/clear", async (req, res) => {
             await collection.deleteMany();
             res.send("database cleared");
@@ -151,10 +179,6 @@ mongoClient.connect(url, {
 
     //}
 });
-
-
-
-
 
 
 //module.exports = app;

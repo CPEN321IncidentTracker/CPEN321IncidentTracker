@@ -6,4 +6,4 @@ cache:
 before_install: cd backend
 install: npm install && npm install express
 before_script: sleep 15
-script: npm test
+script: npm run test:runInBand

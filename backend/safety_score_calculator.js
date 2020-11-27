@@ -9,9 +9,26 @@ exports.getScore = function (location, incidents) {
     var score;
     var near_incidents = 0;
     //console.log(incidents);
+    //console.log(location);
+    if ((typeof location == undefined) ||
+        !(location.hasOwnProperty("latitude") && location.hasOwnProperty("longitude"))) {
+        score = {"score": "-1", "isSafe": "missing latitude or longitude"};
+        return score;
+    }
+
+    if ((typeof location.latitude) != "number" || (typeof location.longitude) != "number") {
+        score = {"score": "-1", "isSafe": "latitude or longitude not numbers"};
+        return score;
+    }
+
     for (incident of incidents) {
-        if (getdist(location, incident) <= near_dist)
-        near_incidents++;
+        if (!(incident.hasOwnProperty("latitude") && incident.hasOwnProperty("longitude"))) {
+            score = {"score": "-1", "isSafe": "missing latitude or longitude"};
+            return score;
+        }
+        else if (getdist(location, incident) <= near_dist) {
+            near_incidents++;
+        }
     }
     if (near_incidents >= 10) {
         score = {"score": "1", "isSafe": "very unsafe"};
