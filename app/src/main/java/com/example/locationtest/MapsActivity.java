@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -219,6 +220,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Calculate the safety score at the blue marker based on number of nearby incidents
     private void computeSafetyScore() throws IOException {
+
+        HashMap<String, Double> safetyScoreRequest = new HashMap<>();
+        safetyScoreRequest.put("latitude", blueMarker.getPosition().latitude);
+        safetyScoreRequest.put("longitude", blueMarker.getPosition().longitude);
+
+
+
+        Call<Integer> call = retrofitInterface.getSafetyScore(safetyScoreRequest);
+        call.enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                if (response.code() == 200) {
+                    Toast.makeText(MapsActivity.this, "Safety Score is" + response.body(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+                Toast.makeText(MapsActivity.this, "Failed to get score", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+
+
+/*
         int score = 0;
         String isSafe = "";
         int nearbyIncidents = 0;
@@ -268,7 +295,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Show the safety score to the user
         String toPrint = "The safety score at this location is: " + score + "/5 " + isSafe;
-        Toast.makeText(MapsActivity.this, toPrint, Toast.LENGTH_LONG).show();
+        Toast.makeText(MapsActivity.this, toPrint, Toast.LENGTH_LONG).show();*/
     }
 
 

@@ -16,4 +16,7 @@ public interface RetrofitInterface {
     @GET("/incident")
     Call<List<Incident>> getIncidents();
 
+    @GET("/score")
+    Call<Integer> getSafetyScore(@Body HashMap<String, Double> map);
+
 }
