@@ -56,7 +56,7 @@ mongoClient.connect(url, {
             collection.find({}).toArray((err, result) => {
                 var score;
                 //console.log(result)
-                //console.log(req.params);
+                //console.log(req.body);
                 if (!isNaN(Number(req.body.latitude)) && !isNaN(Number(req.body.longitude))) {
                     var lat = parseFloat(req.body.latitude);
                     var long = parseFloat(req.body.longitude);
@@ -112,7 +112,26 @@ mongoClient.connect(url, {
                 collection.insertOne(newIncident);
                 res.status(200).send();
             //}
-        });        
+        });
+
+        app.delete("/incident", async (req, res) => {
+            var deleted;
+            var item;
+            //item = await collection.findOne({title: req.body.title, latitude: req.body.latitude,
+            //    longitude: req.body.longitude});
+            //console.log(item);
+            
+            deleted = await collection.deleteOne({title: req.body.title, latitude: req.body.latitude,
+                longitude: req.body.longitude}, true);
+            //console.log(req.body);
+            //console.log(deleted);
+            if (deleted.deletedCount != 1) {
+                res.status(400).send();
+            }
+            else {
+                res.status(200).send();
+            }
+        });
 
         //this function is used to close the
         //database connection and clear it,
