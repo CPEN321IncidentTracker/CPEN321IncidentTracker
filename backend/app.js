@@ -52,19 +52,19 @@ mongoClient.connect(url, {
                 });
         });
 
-        app.get("/score", async (req, res) => {
+        app.get("/score/:latitude/:longitude", async (req, res) => {
             collection.find({}).toArray((err, result) => {
                 var score;
                 //console.log(result)
-                //console.log(req.body);
-                if (!isNaN(Number(req.body.latitude)) && !isNaN(Number(req.body.longitude))) {
-                    var lat = parseFloat(req.body.latitude);
-                    var long = parseFloat(req.body.longitude);
+                //console.log(req.params);
+                if (!isNaN(Number(req.params.latitude)) && !isNaN(Number(req.params.latitude))) {
+                    var lat = parseFloat(req.params.latitude);
+                    var long = parseFloat(req.params.longitude);
                     var location = {latitude: lat, longitude: long};
                     score = scoreCalc.getScore(location, result);
                 }
                 else {
-                    score = scoreCalc.getScore(req.body, result);
+                    score = scoreCalc.getScore(req.params, result);
                 }
                 //console.log(score);
 
@@ -76,7 +76,7 @@ mongoClient.connect(url, {
                     res.status(401).send();
                     return;
                 } 
-                res.send(score);
+                res.status(200).send(score);
                 //collection.deleteMany()
                 });
         });

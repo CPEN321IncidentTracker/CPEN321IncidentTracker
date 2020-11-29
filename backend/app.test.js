@@ -145,4 +145,31 @@ describe("Integration tests", () => {
         done();
     });
     
+    it("test deleting an incident", async (done) => {
+        var response = await request.post("/incident").send(mockincident2);
+        response = await request.post("/incident").send(mockincident3);
+        response = await request.delete("/incident").send(mockincident2);
+        const result = await request.get("/incident");
+        //console.log(mockincident2);
+        expect(response.status).toBe(200);
+        expect(result.body).toHaveLength(1);
+        expect(result.body[0].title).toBe(mockincident3.title);
+        expect(result.body[0].severity).toBe(mockincident3.severity);
+        expect(result.body[0].latitude).toBe(mockincident3.latitude);
+        expect(result.body[0].longitude).toBe(mockincident3.longitude);
+        done();
+    });
+
+    it("test deleting incident that is not in database", async (done) => {
+        var response = await request.post("/incident").send(mockincident3);
+        response = await request.delete("/incident").send(mockincident2);
+        const result = await request.get("/incident");
+        expect(response.status).toBe(400);
+        expect(result.body).toHaveLength(1);
+        expect(result.body[0].title).toBe(mockincident3.title);
+        expect(result.body[0].severity).toBe(mockincident3.severity);
+        expect(result.body[0].latitude).toBe(mockincident3.latitude);
+        expect(result.body[0].longitude).toBe(mockincident3.longitude);
+        done();
+    });
 });

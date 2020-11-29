@@ -102,8 +102,9 @@ describe("Test request handler", () => {
     });
 
     it("test getting score", async (done) => {
-        location = [37.36459, -122.124928];
-        const response = await request.get("/score/123.123/-321.321");
+        //location = [37.36459, -122.124928];
+        const response = await request.get("/score/37.36459/-122.124928");
+        //console.log(response);
         expect(response.body.score).toBe("3");
         expect(response.body.isSafe).toBe("somewhat safe");
         expect(response.status).toBe(200);
@@ -118,7 +119,7 @@ describe("Test request handler", () => {
 
     it("test get score with no longitude/latitude", async (done) => {
         const response = await request.get("/score");
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(404);
         done();
     });
 
