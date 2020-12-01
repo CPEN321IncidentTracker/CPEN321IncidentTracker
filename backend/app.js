@@ -19,8 +19,6 @@ module.exports = server;
 var myDb;
 var collection;
 
-
-
 mongoClient.connect(url, {
     useNewUrlParser : true,
     useUnifiedTopology : true,
@@ -57,16 +55,9 @@ mongoClient.connect(url, {
                 var score;
                 //console.log(result)
                 //console.log(req.params);
-                if (!isNaN(Number(req.params.latitude)) && !isNaN(Number(req.params.latitude))) {
-                    var lat = parseFloat(req.params.latitude);
-                    var long = parseFloat(req.params.longitude);
-                    var location = {latitude: lat, longitude: long};
-                    score = scoreCalc.getScore(location, result);
-                }
-                else {
-                    score = scoreCalc.getScore(req.params, result);
-                }
+                
                 //console.log(score);
+                score = reqToScore(req, result);
 
                 if (score.score === "-1"){
                     if (score.isSafe.localeCompare("missing latitude or longitude")){
@@ -82,21 +73,16 @@ mongoClient.connect(url, {
         });
         
         app.post("/incident", async (req, res) => {
+            var status;
+            
+            status = checkPost(req);
 
-            if (!Number.isInteger(req.body.severity)) {
-                res.status(401).send();
+            if (status) {
+                res.status(status).send();
                 return;
             }
-            if (!(req.body.hasOwnProperty("latitude") && req.body.hasOwnProperty("longitude"))){
-                res.status(403).send();
-                return;
-            }
-            if ((typeof req.body.latitude != "number") || 
-                     (typeof req.body.longitude != "number")) {
-                res.status(402).send();
-                return;
-            }
-            //else {
+
+            else {
                 const newIncident = {
                     title: req.body.title,
                     severity: parseInt(req.body.severity, 10),
@@ -111,7 +97,7 @@ mongoClient.connect(url, {
             */
                 collection.insertOne(newIncident);
                 res.status(200).send();
-            //}
+            }
         });
 
         app.delete("/incident", async (req, res) => {
@@ -125,7 +111,7 @@ mongoClient.connect(url, {
                 longitude: req.body.longitude}, true);
             //console.log(req.body);
             //console.log(deleted);
-            if (deleted.deletedCount != 1) {
+            if (deleted.deletedCount !== 1) {
                 res.status(400).send();
             }
             else {
@@ -155,5 +141,34 @@ mongoClient.connect(url, {
     //}
 });
 
+//This function converts the input parameters to numbers
+//only if they can be converted into such. If they cannot
+//be converted, it directly feeds the inputs parameters and lets
+//getScore deal with the irregularities, and returns the result
+function reqToScore (req, result) {
+    var score;
+    if (!isNaN(Number(req.params.latitude)) && !isNaN(Number(req.params.latitude))) {
+        var lat = parseFloat(req.params.latitude);
+        var long = parseFloat(req.params.longitude);
+        var location = {latitude: lat, longitude: long};
+        score = scoreCalc.getScore(location, result);
+    }
+    else {
+        score = scoreCalc.getScore(req.params, result);
+    }
+    return score;
+}
 
+function checkPost(req) {
+    if (!Number.isInteger(req.body.severity)) {
+        return 401;
+    }
+    if (!(req.body.hasOwnProperty("latitude") && req.body.hasOwnProperty("longitude"))){
+        return 403;
+    }
+    if ((typeof req.body.latitude != "number") || 
+             (typeof req.body.longitude != "number")) {
+        return 402;
+    }
+}
 //module.exports = app;

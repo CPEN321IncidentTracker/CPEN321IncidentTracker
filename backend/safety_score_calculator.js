@@ -1,21 +1,29 @@
 const geolib = require("geolib");
 
+//score array holds corresponding scores to number of incidents
+//anything above 10 should map to index 10 of this array
+const score = [{"score": "5", "isSafe": "very safe"},
+                   {"score": "4", "isSafe": "safe"},
+                   {"score": "4", "isSafe": "safe"},
+                   {"score": "4", "isSafe": "safe"},
+                   {"score": "3", "isSafe": "somewhat safe"},
+                   {"score": "3", "isSafe": "somewhat safe"},
+                   {"score": "3", "isSafe": "somewhat safe"},
+                   {"score": "2", "isSafe": "unsafe"},
+                   {"score": "2", "isSafe": "unsafe"},
+                   {"score": "2", "isSafe": "unsafe"},
+                   {"score": "1", "isSafe": "very unsafe"}]
+
 /*This function takes in a number of near incidents
   and returns a score according to the number of incidents*/
 function makescore(nearIncidents){
+    
     if (nearIncidents >= 10) {
-        return {"score": "1", "isSafe": "very unsafe"};
+        return score[10];
     } 
-    if (nearIncidents >= 7) {
-        return {"score": "2", "isSafe": "unsafe"};
-    } 
-    if (nearIncidents >= 4) {
-        return {"score": "3", "isSafe": "somewhat safe"};
+    else {
+        return score[nearIncidents];
     }
-    if (nearIncidents >= 1) {
-        return {"score": "4", "isSafe": "safe"};
-    }
-    return {"score": "5", "isSafe": "very safe"};
 }
 
 /*This function returns the distance between
@@ -31,15 +39,38 @@ function getdist(location, incident) {
 }
 
 function valLoc(location) {
-    if ((typeof location == "undefined") ||
-        !(location.hasOwnProperty("latitude") && location.hasOwnProperty("longitude"))) {
+    if (hasLocation(location)) {
         return {"score": "-1", "isSafe": "missing latitude or longitude"};
     }
-
-    else if ((typeof location.latitude) != "number" || (typeof location.longitude) != "number") {
+    else if (validLatLong(location)) {
         return {"score": "-1", "isSafe": "latitude or longitude not numbers"};
     }
     return 0;
+}
+function hasLocation(location) {
+    if ((typeof location == "undefined") ||
+        !(location.hasOwnProperty("latitude") && location.hasOwnProperty("longitude"))) {
+        return true;
+    }
+    return false;
+}
+
+function validLatLong(location) {
+    if ((typeof location.latitude) != "number" || (typeof location.longitude) != "number") {
+        return true;
+    }
+    return false;
+}
+
+//Checks if the incidents have valid latitude and longitudes
+//returns false if all are fine
+function checkIncidents(incidents) {
+    for (incident of incidents) {
+        if (!(incident.hasOwnProperty("latitude") && incident.hasOwnProperty("longitude"))) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /*This module takes in a location and array of incidents,
@@ -57,12 +88,12 @@ exports.getScore = function (location, incidents) {
         return score;
     }
 
+    if (checkIncidents(incidents)) {
+        return {"score": "-1", "isSafe": "missing latitude or longitude"};
+    }
+
     for (incident of incidents) {
-        if (!(incident.hasOwnProperty("latitude") && incident.hasOwnProperty("longitude"))) {
-            score = {"score": "-1", "isSafe": "missing latitude or longitude"};
-            return score;
-        }
-        else if (getdist(location, incident) <= nearDist) {
+        if (getdist(location, incident) <= nearDist) {
             nearIncidents++;
         }
     }
