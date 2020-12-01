@@ -12,7 +12,7 @@ const score = [{"score": "5", "isSafe": "very safe"},
                    {"score": "2", "isSafe": "unsafe"},
                    {"score": "2", "isSafe": "unsafe"},
                    {"score": "2", "isSafe": "unsafe"},
-                   {"score": "1", "isSafe": "very unsafe"}]
+                   {"score": "1", "isSafe": "very unsafe"}];
 
 /*This function takes in a number of near incidents
   and returns a score according to the number of incidents*/
@@ -22,7 +22,7 @@ function makescore(nearIncidents){
         return score[10];
     } 
     else {
-        return score[nearIncidents];
+        return score[parseInt(nearIncidents)];
     }
 }
 
@@ -38,15 +38,6 @@ function getdist(location, incident) {
     return dist * mToKm;
 }
 
-function valLoc(location) {
-    if (hasLocation(location)) {
-        return {"score": "-1", "isSafe": "missing latitude or longitude"};
-    }
-    else if (validLatLong(location)) {
-        return {"score": "-1", "isSafe": "latitude or longitude not numbers"};
-    }
-    return 0;
-}
 function hasLocation(location) {
     if ((typeof location == "undefined") ||
         !(location.hasOwnProperty("latitude") && location.hasOwnProperty("longitude"))) {
@@ -62,9 +53,20 @@ function validLatLong(location) {
     return false;
 }
 
+function valLoc(location) {
+    if (hasLocation(location)) {
+        return {"score": "-1", "isSafe": "missing latitude or longitude"};
+    }
+    else if (validLatLong(location)) {
+        return {"score": "-1", "isSafe": "latitude or longitude not numbers"};
+    }
+    return 0;
+}
+
 //Checks if the incidents have valid latitude and longitudes
 //returns false if all are fine
 function checkIncidents(incidents) {
+    var incident;
     for (incident of incidents) {
         if (!(incident.hasOwnProperty("latitude") && incident.hasOwnProperty("longitude"))) {
             return true;

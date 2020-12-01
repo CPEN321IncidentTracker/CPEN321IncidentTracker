@@ -19,6 +19,44 @@ module.exports = server;
 var myDb;
 var collection;
 
+//This function converts the input parameters to numbers
+//only if they can be converted into such. If they cannot
+//be converted, it directly feeds the inputs parameters and lets
+//getScore deal with the irregularities, and returns the result
+function reqToScore (req, result) {
+    var score;
+    if (!isNaN(Number(req.params.latitude)) && !isNaN(Number(req.params.latitude))) {
+        var lat = parseFloat(req.params.latitude);
+        var long = parseFloat(req.params.longitude);
+        var location = {latitude: lat, longitude: long};
+        score = scoreCalc.getScore(location, result);
+    }
+    else {
+        score = scoreCalc.getScore(req.params, result);
+    }
+    return score;
+}
+
+function checkLatLong (req) {
+    if ((typeof req.body.latitude != "number") || 
+             (typeof req.body.longitude != "number")) {
+        return 402;
+    }
+    return 0;
+}
+
+function checkPost(req) {
+    if (!Number.isInteger(req.body.severity)) {
+        return 401;
+    }
+    if (!(req.body.hasOwnProperty("latitude") && req.body.hasOwnProperty("longitude"))){
+        return 403;
+    }
+    else {
+        return checkLatLong(req);
+    }
+}
+
 mongoClient.connect(url, {
     useNewUrlParser : true,
     useUnifiedTopology : true,
@@ -141,34 +179,5 @@ mongoClient.connect(url, {
     //}
 });
 
-//This function converts the input parameters to numbers
-//only if they can be converted into such. If they cannot
-//be converted, it directly feeds the inputs parameters and lets
-//getScore deal with the irregularities, and returns the result
-function reqToScore (req, result) {
-    var score;
-    if (!isNaN(Number(req.params.latitude)) && !isNaN(Number(req.params.latitude))) {
-        var lat = parseFloat(req.params.latitude);
-        var long = parseFloat(req.params.longitude);
-        var location = {latitude: lat, longitude: long};
-        score = scoreCalc.getScore(location, result);
-    }
-    else {
-        score = scoreCalc.getScore(req.params, result);
-    }
-    return score;
-}
 
-function checkPost(req) {
-    if (!Number.isInteger(req.body.severity)) {
-        return 401;
-    }
-    if (!(req.body.hasOwnProperty("latitude") && req.body.hasOwnProperty("longitude"))){
-        return 403;
-    }
-    if ((typeof req.body.latitude != "number") || 
-             (typeof req.body.longitude != "number")) {
-        return 402;
-    }
-}
 //module.exports = app;
