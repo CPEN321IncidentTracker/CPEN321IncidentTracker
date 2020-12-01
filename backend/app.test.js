@@ -13,11 +13,11 @@ const mongod = new MongoMemoryServer();
 const mongoClient = require("mongodb").MongoClient;
 
 const { expect } = require("@jest/globals");
+var { jest } = require("@jest/globals");
 
 var App = require("./app");
 const supertest = require("supertest");
 const request = supertest(App);
-
 var connection;
 
 describe("Integration tests", () => {    

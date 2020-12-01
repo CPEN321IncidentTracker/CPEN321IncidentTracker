@@ -1,5 +1,4 @@
-
-
+var { jest } = require("@jest/globals");
 
 describe("safety score calculator tests", () => {
     var scoreCalc = require("./safety_score_calculator");
