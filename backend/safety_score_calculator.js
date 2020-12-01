@@ -22,7 +22,7 @@ function makescore(nearIncidents){
         return score[10];
     } 
     else {
-        return score[parseInt(nearIncidents)];
+        return score[parseInt(nearIncidents, 10)];
     }
 }
 
@@ -53,16 +53,6 @@ function validLatLong(location) {
     return false;
 }
 
-function valLoc(location) {
-    if (hasLocation(location)) {
-        return {"score": "-1", "isSafe": "missing latitude or longitude"};
-    }
-    else if (validLatLong(location)) {
-        return {"score": "-1", "isSafe": "latitude or longitude not numbers"};
-    }
-    return 0;
-}
-
 //Checks if the incidents have valid latitude and longitudes
 //returns false if all are fine
 function checkIncidents(incidents) {
@@ -75,6 +65,19 @@ function checkIncidents(incidents) {
     return false;
 }
 
+function filterBad(location, incidents) {
+    if (hasLocation(location)) {
+        return {"score": "-1", "isSafe": "missing latitude or longitude"};
+    }
+    if (validLatLong(location)) {
+        return {"score": "-1", "isSafe": "latitude or longitude not numbers"};
+    }
+    if (checkIncidents(incidents)) {
+        return {"score": "-1", "isSafe": "missing latitude or longitude"};
+    }
+    return 0;
+}
+
 /*This module takes in a location and array of incidents,
   determines how many incidents are near the given location,
   and returns an object with a score and safety fields*/
@@ -85,15 +88,10 @@ exports.getScore = function (location, incidents) {
     var nearIncidents = 0;
     //console.log(incidents);
     //console.log(location);
-    score = valLoc(location);
+    score = filterBad(location, incidents);
     if (score) {
         return score;
     }
-
-    if (checkIncidents(incidents)) {
-        return {"score": "-1", "isSafe": "missing latitude or longitude"};
-    }
-
     for (incident of incidents) {
         if (getdist(location, incident) <= nearDist) {
             nearIncidents++;
