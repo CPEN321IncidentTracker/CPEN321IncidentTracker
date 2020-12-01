@@ -123,6 +123,18 @@ describe("Test request handler", () => {
         done();
     });
 
+    it("test get score with no longitude/latitude", async (done) => {
+        const response = await request.get("/score//");
+        expect(response.status).toBe(404);
+        done();
+    });
+
+    it("test get score with no longitude", async (done) => {
+        const response = await request.get("/score/100");
+        expect(response.status).toBe(404);
+        done();
+    });
+
     it("test deleting an incident", async (done) => {
         var response = await request.post("/incident").send(mockincident2);
         response = await request.post("/incident").send(mockincident3);

@@ -88,6 +88,8 @@ mongoClient.connect(url, {
                 });
         });
 
+        //If latitude or longitude are not present, then this request
+        //handler will not be be triggered, causing an automatic 404 error
         app.get("/score/:latitude/:longitude", async (req, res) => {
             collection.find({}).toArray((err, result) => {
                 var score;
@@ -98,11 +100,7 @@ mongoClient.connect(url, {
                 score = reqToScore(req, result);
 
                 if (score.score === "-1"){
-                    if (score.isSafe.localeCompare("missing latitude or longitude")){
-                        res.status(402).send();
-                        return;
-                    }
-                    res.status(401).send();
+                    res.status(402).send();
                     return;
                 } 
                 res.status(200).send(score);

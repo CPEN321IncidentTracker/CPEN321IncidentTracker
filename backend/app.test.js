@@ -50,6 +50,29 @@ describe("Integration tests", () => {
                             "latitude" : "BAD", "longitude" : "BAD"};
     const malIncident3 = {"title" : "mal3", "severity" : 2};
 
+    const incident1 = {"id": 1, "title" : "1", "severity" : 5, 
+                "latitude" : 200, "longitude" : -122.123};
+    const incident2 = {"id": 2, "title" : "2", "severity" : 5, 
+                "latitude" : 100.001, "longitude" : 100.001};
+    const incident3 = {"id": 3, "title" : "3", "severity" : 5, 
+                "latitude" : 99.999, "longitude" : 99.999};
+    const incident4 = {"id": 4, "title" : "4", "severity" : 4, 
+                "latitude" : 100.002, "longitude" : 100.002};
+    const incident5 = {"id": 5, "title" : "5", "severity" : 5, 
+                "latitude" : 100.003, "longitude" : 100.003};
+    const incident6 = {"id": 6, "title" : "6", "severity" : 4, 
+                "latitude" : 100.004, "longitude" : 100.004};
+    const incident7 = {"id": 7, "title" : "7", "severity" : 3, 
+                "latitude" : 100.005, "longitude" : 100.005};
+    const incident8 = {"id": 8, "title" : "8", "severity" : 2, 
+                "latitude" : 99.998, "longitude" : 99.998};
+    const incident9 = {"id": 9, "title" : "9", "severity" : 4, 
+                "latitude" : 99.997, "longitude" : 99.997};
+    const incident10 = {"id": 10, "title" : "10", "severity" : 1, 
+                "latitude" : 99.996, "longitude" : 99.996};
+    const incident11 = {"id": 11, "title" : "11", "severity" : 3, 
+                "latitude" : 99.995, "longitude" : 99.995};
+
     afterAll(async (done) => {
         await request.delete("/shutdown");
         await connection.close(done);
@@ -115,9 +138,24 @@ describe("Integration tests", () => {
         expect(response.status).toBe(201);
         done();
     });
+
+    it("test getting a score near no incidents", async (done) => {
+        // reference location = [37.36459, -122.124928];
+
+        //populate the database with some incidents
+
+        //var result = await request.post("/incident").send(mockincident1());
+        var result = await request.post("/incident").send(mockincident2);
+        result = await request.post("/incident").send(mockincident3);
+        result = await request.get("/score/40.36459/122.124928").send(location);
+        //console.log(result);
+        expect(result.body.score).toBe("5");
+        expect(result.body.isSafe).toBe("very safe");
+        expect(result.status).toBe(200);
+        done();
+    });
     
-    
-    it("test getting a score", async (done) => {
+    it("test getting a score near two incidents", async (done) => {
         // reference location = [37.36459, -122.124928];
 
         //populate the database with some incidents
@@ -129,6 +167,48 @@ describe("Integration tests", () => {
         //console.log(result);
         expect(result.body.score).toBe("4");
         expect(result.body.isSafe).toBe("safe");
+        expect(result.status).toBe(200);
+        done();
+    });
+
+    it("test getting a score near 6 incidents", async (done) => {
+
+        //populate the database with some incidents
+        var result = await request.post("/incident").send(incident1);
+        result = await request.post("/incident").send(incident2);
+        result = await request.post("/incident").send(incident3);
+        result = await request.post("/incident").send(incident4);
+        result = await request.post("/incident").send(incident5);
+        result = await request.post("/incident").send(incident6);
+        result = await request.post("/incident").send(incident7);
+
+        result = await request.get("/score/100/100").send(location);
+        //console.log(result);
+        expect(result.body.score).toBe("3");
+        expect(result.body.isSafe).toBe("somewhat safe");
+        expect(result.status).toBe(200);
+        done();
+    });
+
+    it("test getting a score near 10 incidents", async (done) => {
+
+        //populate the database with some incidents
+        var result = await request.post("/incident").send(incident1);
+        result = await request.post("/incident").send(incident2);
+        result = await request.post("/incident").send(incident3);
+        result = await request.post("/incident").send(incident4);
+        result = await request.post("/incident").send(incident5);
+        result = await request.post("/incident").send(incident6);
+        result = await request.post("/incident").send(incident7);
+        result = await request.post("/incident").send(incident8);
+        result = await request.post("/incident").send(incident9);
+        result = await request.post("/incident").send(incident10);
+        result = await request.post("/incident").send(incident11);
+
+        result = await request.get("/score/100/100").send(location);
+        //console.log(result);
+        expect(result.body.score).toBe("1");
+        expect(result.body.isSafe).toBe("very unsafe");
         expect(result.status).toBe(200);
         done();
     });
@@ -144,7 +224,19 @@ describe("Integration tests", () => {
         expect(response.status).toBe(404);
         done();
     });
+
+    it("test get score with no longitude", async (done) => {
+        const response = await request.get("/score/100");
+        expect(response.status).toBe(404);
+        done();
+    });
     
+    it("test get score with no longitude/latitude", async (done) => {
+        const response = await request.get("/score//");
+        expect(response.status).toBe(404);
+        done();
+    });
+
     it("test deleting an incident", async (done) => {
         var response = await request.post("/incident").send(mockincident2);
         response = await request.post("/incident").send(mockincident3);
