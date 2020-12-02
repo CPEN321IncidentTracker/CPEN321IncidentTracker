@@ -137,7 +137,7 @@ mongoClient.connect(url, {
             }
         });
 
-        app.delete("/incident", async (req, res) => {
+        app.post("/delete", async (req, res) => {
             var deleted;
             var item;
             //item = await collection.findOne({title: req.body.title, latitude: req.body.latitude,
