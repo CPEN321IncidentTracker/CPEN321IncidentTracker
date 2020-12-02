@@ -45,7 +45,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, DeleteDialog.DeleteDialogListener {
 
     private GoogleMap mMap;
     private static final String BASE_URL = "http://52.149.135.175:80";
@@ -56,6 +56,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker blueMarker;
     private RetrofitInterface retrofitInterface;
     private Incident selectedIncident;
+    private boolean incidentSelected = false;
+    private String deletePassword;
 
 
     @SuppressLint("MissingPermission")
@@ -109,12 +111,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapClick(LatLng latLng) {
                 blueMarker.setPosition(latLng);
+                incidentSelected = false;
             }
         });
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 String markerTitle = marker.getTitle();
+                incidentSelected = !markerTitle.equals("You are here");
                 String incidentTitle = markerTitle.split(" -> Severity: ", 2)[0];
                 int incidentSeverity = Integer.parseInt(markerTitle.split(" -> Severity: ", 2)[1]);
                 double latitude = marker.getPosition().latitude;
@@ -217,24 +221,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         deleteIncidentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Call<Void> call = retrofitInterface.deleteIncident(selectedIncident);
-                call.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        Toast.makeText(MapsActivity.this, "Incident Deleted", Toast.LENGTH_LONG).show();
-                        mMap.clear();
 
-                        (new Handler()).postDelayed(MapsActivity.this::retrieveIncidents, 1500);
+                if (incidentSelected) {
+                    DeleteDialog deleteDialog = new DeleteDialog();
+                    deleteDialog.show(getSupportFragmentManager(), "delete dialog");
+                }
+                else{
+                    Toast.makeText(MapsActivity.this, "No Incident Selected", Toast.LENGTH_LONG).show();
+                    return;
+                }
 
-                        displayCurrentLocation();
-                    }
 
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(MapsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
 
-                    }
-                });
+
+
+
 
             }
         });
@@ -367,4 +368,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    @Override
+    public void applyTexts(String password) {
+        deletePassword = password;
+        if (deletePassword.equals("Cpen321")){
+            Call<Void> call = retrofitInterface.deleteIncident(selectedIncident);
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    Toast.makeText(MapsActivity.this, "Incident Deleted", Toast.LENGTH_LONG).show();
+                    mMap.clear();
+
+                    (new Handler()).postDelayed(MapsActivity.this::retrieveIncidents, 1500);
+
+                    displayCurrentLocation();
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Toast.makeText(MapsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+
+                }
+            });
+        } else {
+            Toast.makeText(MapsActivity.this, "Incorrect Password", Toast.LENGTH_LONG).show();
+        }
+    }
 }
