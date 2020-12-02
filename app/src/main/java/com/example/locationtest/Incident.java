@@ -28,9 +28,16 @@ public class Incident {
         return new LatLng(latitude, longitude);
     }
 
+    public void setLocation(double lat, double lon) {
+        latitude = lat;
+        longitude = lon;
+    }
+
     public String getTitle(){
         return title;
     }
+
+    public void setTitle(String t){title = t;}
 
     public int getSeverity(){
         return severity;

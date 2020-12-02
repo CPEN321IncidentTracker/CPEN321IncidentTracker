@@ -55,6 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng myLocation;
     private Marker blueMarker;
     private RetrofitInterface retrofitInterface;
+    private Incident selectedIncident;
 
 
     @SuppressLint("MissingPermission")
@@ -110,6 +111,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 blueMarker.setPosition(latLng);
             }
         });
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                String markerTitle = marker.getTitle();
+                String incidentTitle = markerTitle.split(" -> Severity: ", 2)[0];
+                int incidentSeverity = Integer.parseInt(markerTitle.split(" -> Severity: ", 2)[1]);
+                double latitude = marker.getPosition().latitude;
+                double longitude = marker.getPosition().longitude;
+                selectedIncident = new Incident(incidentTitle, latitude, longitude, incidentSeverity);
+                return false;
+            }
+        });
 
         // Enable all functionality for map navigation
         mMap.setMyLocationEnabled(true);
@@ -127,9 +140,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Wait 5 seconds before displaying current location
         Toast.makeText(MapsActivity.this, "Give us a moment...", Toast.LENGTH_LONG).show();
-        (new Handler()).postDelayed(this::displayCurrentLocation, 5000);
+        (new Handler()).postDelayed(this::displayCurrentLocation, 1500);
 
         // Call the sever and get the list of incidents
+        retrieveIncidents();
+    }
+
+    private void retrieveIncidents() {
         Call<List<Incident>> call = retrofitInterface.getIncidents();
         call.enqueue(new Callback<List<Incident>>() {
             @Override
@@ -140,11 +157,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
                 // Add incidents from HTTP response
+                incidents.clear();
                 incidents.addAll(response.body());
 
                 // Add markers at incidents from server
                 for (Incident i : incidents) {
-                    mMap.addMarker(new MarkerOptions().position(i.getLocation()).title(i.getTitle() + " (" + i.getSeverity() + ")"));
+
+                    mMap.addMarker(new MarkerOptions().position(i.getLocation()).title(i.getTitle() + " -> Severity: " + i.getSeverity()));
                 }
                 Toast.makeText(MapsActivity.this, "Response was successful", Toast.LENGTH_LONG).show();
             }
@@ -193,6 +212,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+
+        Button deleteIncidentButton = findViewById(R.id.deleteIncidentButton);
+        deleteIncidentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Call<Void> call = retrofitInterface.deleteIncident(selectedIncident);
+                call.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        Toast.makeText(MapsActivity.this, "Incident Deleted", Toast.LENGTH_LONG).show();
+                        mMap.clear();
+
+                        (new Handler()).postDelayed(MapsActivity.this::retrieveIncidents, 1500);
+
+                        displayCurrentLocation();
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        Toast.makeText(MapsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
+
+                    }
+                });
+
+            }
+        });
     }
 
 
@@ -221,24 +266,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Calculate the safety score at the blue marker based on number of nearby incidents
     private void computeSafetyScore() throws IOException {
 
-        HashMap<String, Double> safetyScoreRequest = new HashMap<>();
-        safetyScoreRequest.put("latitude", blueMarker.getPosition().latitude);
-        safetyScoreRequest.put("longitude", blueMarker.getPosition().longitude);
-
-
-
-        Call<Integer> call = retrofitInterface.getSafetyScore(safetyScoreRequest);
-        call.enqueue(new Callback<Integer>() {
+        Call<ScoreMessage> call = retrofitInterface.getSafetyScore(String.valueOf((float) blueMarker.getPosition().latitude), String.valueOf((float)blueMarker.getPosition().longitude));
+        call.enqueue(new Callback<ScoreMessage>() {
             @Override
-            public void onResponse(Call<Integer> call, Response<Integer> response) {
-                if (response.code() == 200) {
-                    Toast.makeText(MapsActivity.this, "Safety Score is" + response.body(), Toast.LENGTH_LONG).show();
-                }
+            public void onResponse(Call<ScoreMessage> call, Response<ScoreMessage> response) {
+                Toast.makeText(MapsActivity.this, response.body().score, Toast.LENGTH_LONG).show();
             }
 
             @Override
-            public void onFailure(Call<Integer> call, Throwable t) {
-                Toast.makeText(MapsActivity.this, "Failed to get score", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<ScoreMessage> call, Throwable t) {
+                Toast.makeText(MapsActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
 
             }
         });
