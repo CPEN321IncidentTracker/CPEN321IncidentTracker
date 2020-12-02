@@ -105,7 +105,7 @@ describe("Test request handler", () => {
     it("test getting score", async (done) => {
         //location = [37.36459, -122.124928];
         const response = await request.get("/score/37.36459/-122.124928");
-        console.log(response.body);
+        //console.log(response.body);
         expect(response.body.score).toBe("Safety score at this location is 3 (somewhat safe)");
         expect(response.status).toBe(200);
         done();

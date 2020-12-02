@@ -148,7 +148,7 @@ describe("Integration tests", () => {
         var result = await request.post("/incident").send(mockincident2);
         result = await request.post("/incident").send(mockincident3);
         result = await request.get("/score/40.36459/122.124928").send(location);
-        console.log(result.body);
+        //console.log(result.body);
         expect(result.body.score).toBe("Safety score at this location is 5 (very safe)");
         expect(result.status).toBe(200);
         done();
