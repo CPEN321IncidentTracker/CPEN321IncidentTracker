@@ -41,8 +41,7 @@ describe("safety score calculator tests", () => {
     it("Location near no incidents", async (done) => {
         incidentList.push(incident1);
         score = scoreCalc.getScore(location, incidentList);
-        expect(score.score).toBe("5");
-        expect(score.isSafe).toBe("very safe");
+        expect(score).toBe("Safety score at this location is 5 (very safe)");
         done();
     });
 
@@ -50,8 +49,7 @@ describe("safety score calculator tests", () => {
         incidentList.push(incident2);
         incidentList.push(incident3);
         score = scoreCalc.getScore(location, incidentList);
-        expect(score.score).toBe("4");
-        expect(score.isSafe).toBe("safe");
+        expect(score).toBe("Safety score at this location is 4 (safe)");
         done();
     });
 
@@ -60,8 +58,7 @@ describe("safety score calculator tests", () => {
         incidentList.push(incident5);
         incidentList.push(incident6);
         score = scoreCalc.getScore(location, incidentList);
-        expect(score.score).toBe("3");
-        expect(score.isSafe).toBe("somewhat safe");
+        expect(score).toBe("Safety score at this location is 3 (somewhat safe)");
         done();
     });
 
@@ -69,8 +66,7 @@ describe("safety score calculator tests", () => {
         incidentList.push(incident7);
         incidentList.push(incident8);
         score = scoreCalc.getScore(location, incidentList);
-        expect(score.score).toBe("2");
-        expect(score.isSafe).toBe("unsafe");
+        expect(score).toBe("Safety score at this location is 2 (unsafe)");
         done();
     });
 
@@ -79,30 +75,26 @@ describe("safety score calculator tests", () => {
         incidentList.push(incident10);
         incidentList.push(incident11);
         score = scoreCalc.getScore(location, incidentList);
-        expect(score.score).toBe("1");
-        expect(score.isSafe).toBe("very unsafe");
+        expect(score).toBe("Safety score at this location is 1 (very unsafe)");
         done();
     });
 
     it("Location is missing latitude and longitude", async (done) => {
         score = scoreCalc.getScore(badLocation, incidentList);
-        expect(score.score).toBe("-1");
-        expect(score.isSafe).toBe("missing latitude or longitude");
+        expect(score).toBe(-1);
         done();
     });
 
     it("An incident is missing latitude and longitude", async (done) => {
         incidentList.push(badIncident);
         score = scoreCalc.getScore(location, incidentList);
-        expect(score.score).toBe("-1");
-        expect(score.isSafe).toBe("missing latitude or longitude");
+        expect(score).toBe(-1);
         done();
     });
 
     it("Location latitude and longitude malformed", async (done) => {
         score = scoreCalc.getScore(malLocation, incidentList);
-        expect(score.score).toBe("-1");
-        expect(score.isSafe).toBe("latitude or longitude not numbers");
+        expect(score).toBe(-1);
         done();
     });
 

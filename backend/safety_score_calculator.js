@@ -2,17 +2,17 @@ const geolib = require("geolib");
 
 //score array holds corresponding scores to number of incidents
 //anything above 10 should map to index 10 of this array
-const score = [{"score": "5", "isSafe": "very safe"},
-                   {"score": "4", "isSafe": "safe"},
-                   {"score": "4", "isSafe": "safe"},
-                   {"score": "4", "isSafe": "safe"},
-                   {"score": "3", "isSafe": "somewhat safe"},
-                   {"score": "3", "isSafe": "somewhat safe"},
-                   {"score": "3", "isSafe": "somewhat safe"},
-                   {"score": "2", "isSafe": "unsafe"},
-                   {"score": "2", "isSafe": "unsafe"},
-                   {"score": "2", "isSafe": "unsafe"},
-                   {"score": "1", "isSafe": "very unsafe"}];
+const score = ["Safety score at this location is 5 (very safe)",
+                "Safety score at this location is 4 (safe)",
+                "Safety score at this location is 4 (safe)",
+                "Safety score at this location is 4 (safe)",
+                "Safety score at this location is 3 (somewhat safe)",
+                "Safety score at this location is 3 (somewhat safe)",
+                "Safety score at this location is 3 (somewhat safe)",
+                "Safety score at this location is 2 (unsafe)",
+                "Safety score at this location is 2 (unsafe)",
+                "Safety score at this location is 2 (unsafe)",
+                "Safety score at this location is 1 (very unsafe)"];
 
 /*This function takes in a number of near incidents
   and returns a score according to the number of incidents*/
@@ -67,13 +67,13 @@ function checkIncidents(incidents) {
 
 function filterBad(location, incidents) {
     if (hasLocation(location)) {
-        return {"score": "-1", "isSafe": "missing latitude or longitude"};
+        return -1;
     }
     if (validLatLong(location)) {
-        return {"score": "-1", "isSafe": "latitude or longitude not numbers"};
+        return -1;
     }
     if (checkIncidents(incidents)) {
-        return {"score": "-1", "isSafe": "missing latitude or longitude"};
+        return -1;
     }
     return 0;
 }
@@ -90,6 +90,7 @@ exports.getScore = function (location, incidents) {
     //console.log(location);
     score = filterBad(location, incidents);
     if (score) {
+        //console.log(score);
         return score;
     }
     for (incident of incidents) {

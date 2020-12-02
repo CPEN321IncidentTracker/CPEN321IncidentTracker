@@ -148,9 +148,8 @@ describe("Integration tests", () => {
         var result = await request.post("/incident").send(mockincident2);
         result = await request.post("/incident").send(mockincident3);
         result = await request.get("/score/40.36459/122.124928").send(location);
-        //console.log(result);
-        expect(result.body.score).toBe("5");
-        expect(result.body.isSafe).toBe("very safe");
+        console.log(result.body);
+        expect(result.body.score).toBe("Safety score at this location is 5 (very safe)");
         expect(result.status).toBe(200);
         done();
     });
@@ -165,8 +164,7 @@ describe("Integration tests", () => {
         result = await request.post("/incident").send(mockincident3);
         result = await request.get("/score/37.36459/-122.124928").send(location);
         //console.log(result);
-        expect(result.body.score).toBe("4");
-        expect(result.body.isSafe).toBe("safe");
+        expect(result.body.score).toBe("Safety score at this location is 4 (safe)");
         expect(result.status).toBe(200);
         done();
     });
@@ -184,8 +182,7 @@ describe("Integration tests", () => {
 
         result = await request.get("/score/100/100").send(location);
         //console.log(result);
-        expect(result.body.score).toBe("3");
-        expect(result.body.isSafe).toBe("somewhat safe");
+        expect(result.body.score).toBe("Safety score at this location is 3 (somewhat safe)");
         expect(result.status).toBe(200);
         done();
     });
@@ -207,8 +204,7 @@ describe("Integration tests", () => {
 
         result = await request.get("/score/100/100").send(location);
         //console.log(result);
-        expect(result.body.score).toBe("1");
-        expect(result.body.isSafe).toBe("very unsafe");
+        expect(result.body.score).toBe("Safety score at this location is 1 (very unsafe)");
         expect(result.status).toBe(200);
         done();
     });

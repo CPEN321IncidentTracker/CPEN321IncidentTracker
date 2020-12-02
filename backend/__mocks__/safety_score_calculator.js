@@ -17,11 +17,11 @@ exports.getScore = function (location, incidents) {
     var score;
     //console.log(location);
     if (hasLocation(location)) {
-        return {"score": "-1", "isSafe": "missing latitude or longitude"};
+        return -1;
     }
     else if (validLatLong(location)) {
-        return {"score": "-1", "isSafe": "latitude or longitude not numbers"};
+        return -1;
     }
-    score = {"score": "3", "isSafe": "somewhat safe"};
+    score = "Safety score at this location is 3 (somewhat safe)";
     return score;
 };

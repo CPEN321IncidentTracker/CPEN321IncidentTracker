@@ -99,11 +99,12 @@ mongoClient.connect(url, {
                 //console.log(score);
                 score = reqToScore(req, result);
 
-                if (score.score === "-1"){
+                if (score === -1){
                     res.status(402).send();
                     return;
-                } 
-                res.status(200).send(score);
+                }
+                //console.log(score);
+                res.send({score});
                 //collection.deleteMany()
                 });
         });
