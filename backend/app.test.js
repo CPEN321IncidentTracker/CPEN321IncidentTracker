@@ -148,7 +148,7 @@ describe("Integration tests", () => {
         var result = await request.post("/incident").send(mockincident2);
         result = await request.post("/incident").send(mockincident3);
         result = await request.get("/score/40.36459/122.124928").send(location);
-        console.log(result.body);
+        //console.log(result.body);
         expect(result.body.score).toBe("Safety score at this location is 5 (very safe)");
         expect(result.status).toBe(200);
         done();
@@ -236,7 +236,7 @@ describe("Integration tests", () => {
     it("test deleting an incident", async (done) => {
         var response = await request.post("/incident").send(mockincident2);
         response = await request.post("/incident").send(mockincident3);
-        response = await request.delete("/incident").send(mockincident2);
+        response = await request.post("/delete").send(mockincident2);
         const result = await request.get("/incident");
         //console.log(mockincident2);
         expect(response.status).toBe(200);
@@ -250,7 +250,7 @@ describe("Integration tests", () => {
 
     it("test deleting incident that is not in database", async (done) => {
         var response = await request.post("/incident").send(mockincident3);
-        response = await request.delete("/incident").send(mockincident2);
+        response = await request.post("/delete").send(mockincident2);
         const result = await request.get("/incident");
         expect(response.status).toBe(400);
         expect(result.body).toHaveLength(1);

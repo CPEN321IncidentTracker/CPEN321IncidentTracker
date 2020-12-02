@@ -82,7 +82,7 @@ function filterBad(location, incidents) {
   determines how many incidents are near the given location,
   and returns an object with a score and safety fields*/
 exports.getScore = function (location, incidents) {
-    const nearDist = 8;
+    const nearDist = 4;
     var incident;
     var score;
     var nearIncidents = 0;

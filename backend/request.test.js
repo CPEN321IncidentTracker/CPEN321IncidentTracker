@@ -105,7 +105,7 @@ describe("Test request handler", () => {
     it("test getting score", async (done) => {
         //location = [37.36459, -122.124928];
         const response = await request.get("/score/37.36459/-122.124928");
-        console.log(response.body);
+        //console.log(response.body);
         expect(response.body.score).toBe("Safety score at this location is 3 (somewhat safe)");
         expect(response.status).toBe(200);
         done();
@@ -138,7 +138,7 @@ describe("Test request handler", () => {
     it("test deleting an incident", async (done) => {
         var response = await request.post("/incident").send(mockincident2);
         response = await request.post("/incident").send(mockincident3);
-        response = await request.delete("/incident").send(mockincident2);
+        response = await request.post("/delete").send(mockincident2);
         const result = await request.get("/incident");
         //console.log(mockincident2);
         expect(response.status).toBe(200);
@@ -152,7 +152,7 @@ describe("Test request handler", () => {
 
     it("test deleting incident that is not in database", async (done) => {
         var response = await request.post("/incident").send(mockincident3);
-        response = await request.delete("/incident").send(mockincident2);
+        response = await request.post("/delete").send(mockincident2);
         const result = await request.get("/incident");
         expect(response.status).toBe(400);
         expect(result.body).toHaveLength(1);
