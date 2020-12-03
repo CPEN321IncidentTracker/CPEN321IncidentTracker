@@ -116,23 +116,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMapClick(LatLng latLng) {
                 safetyCircle.remove();
                 blueMarker.setPosition(latLng);
+                displayNearbyRadius();
                 incidentSelected = false;
             }
         });
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                safetyCircle.remove();
                 String markerTitle = marker.getTitle();
-                incidentSelected = !markerTitle.equals("You are here");
-                String incidentTitle = markerTitle.split(" -> Severity: ", 2)[0];
-                int incidentSeverity = Integer.parseInt(markerTitle.split(" -> Severity: ", 2)[1]);
-                double latitude = marker.getPosition().latitude;
-                double longitude = marker.getPosition().longitude;
-                selectedIncident = new Incident(incidentTitle, latitude, longitude, incidentSeverity);
+                if (!markerTitle.equals("You are here")){
+                    incidentSelected = true;
+                    String incidentTitle = markerTitle.split(" -> Severity: ", 2)[0];
+                    int incidentSeverity = Integer.parseInt(markerTitle.split(" -> Severity: ", 2)[1]);
+                    double latitude = marker.getPosition().latitude;
+                    double longitude = marker.getPosition().longitude;
+                    selectedIncident = new Incident(incidentTitle, latitude, longitude, incidentSeverity);
+                }
                 return false;
             }
         });
+
 
         // Enable all functionality for map navigation
         mMap.setMyLocationEnabled(true);
@@ -143,7 +146,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
             @Override
             public boolean onMyLocationButtonClick() {
-                safetyCircle.remove();
                 blueMarker.setPosition(myLocation);
                 return false;
             }
@@ -203,7 +205,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 try {
-                    safetyCircle.remove();
                     computeSafetyScore();
                 } catch (IOException e) {
                     Toast.makeText(MapsActivity.this, "Error", Toast.LENGTH_LONG).show();
@@ -228,7 +229,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         deleteIncidentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                safetyCircle.remove();
                 DeleteDialog deleteDialog = new DeleteDialog();
                 deleteDialog.show(getSupportFragmentManager(), "delete dialog");
             }
@@ -260,8 +260,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Calculate the safety score at the blue marker based on number of nearby incidents
     private void computeSafetyScore() throws IOException {
-
-        displayNearbyRadius();
 
         Call<ScoreMessage> call = retrofitInterface.getSafetyScore(String.valueOf((float) blueMarker.getPosition().latitude), String.valueOf((float)blueMarker.getPosition().longitude));
         call.enqueue(new Callback<ScoreMessage>() {
@@ -307,6 +305,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onMarkerDragEnd(Marker marker) {
+                displayNearbyRadius();
                 blueMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             }
         });
