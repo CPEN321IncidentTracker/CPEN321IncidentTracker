@@ -1,15 +1,3 @@
-//installs:
-//npm install --save-dev jest
-//npm install supertest --save-dev supertest
-//npm install @shelf/jest-mongodb --dev
-//npm install mongodb-memory-server --save-dev
-//npm install mongodb-memory-server-core --save-dev
-
-/*
-const {MongoMemoryServer} = require('mongodb-memory-server');
-const jestMongodbConfig =  require('./jest-mongodb-config');
-const mongod = new MongoMemoryServer();
-*/
 const mongoClient = require("mongodb").MongoClient;
 
 const { expect } = require("@jest/globals");
@@ -24,8 +12,6 @@ describe("Integration tests", () => {
 
     beforeAll(async () => {
         connection = await mongoClient.connect("mongodb://localhost:27017");
-        //db = await connection.db(global.__MONGO_DB_NAME__);
-
     });
 
     const mockincidentlist = jest.fn();
@@ -76,12 +62,6 @@ describe("Integration tests", () => {
     afterAll(async (done) => {
         await request.delete("/shutdown");
         await connection.close(done);
-        
-        //await global.__MONGOD__.stop();
-    });
-    
-    beforeEach(async () => {
-        //to be added once more tests are implemented
     });
 
     afterEach( async () => {
@@ -93,20 +73,14 @@ describe("Integration tests", () => {
         
         var result = await request.post("/incident").send(mockincident1());
 
-        const mock1 = mockincident1();
-        
-        //console.log(result);
+        const mock1 = mockincident1();;
         const response = await request.get("/incident");
-        //console.log(response.body);
         expect(response.body[0].title).toBe(mock1.title);
         expect(response.body[0].severity).toBe(mock1.severity);
         expect(response.body[0].latitude).toBe(mock1.latitude);
         expect(response.body[0].longitude).toBe(mock1.longitude);
         expect(response.status).toBe(200);
         expect(result.status).toBe(200);
-
-        //result = await request.delete("/incident");
-        //console.log(mockincidentlist())
         done();
     });
     
@@ -140,30 +114,18 @@ describe("Integration tests", () => {
     });
 
     it("test getting a score near no incidents", async (done) => {
-        // reference location = [37.36459, -122.124928];
-
-        //populate the database with some incidents
-
-        //var result = await request.post("/incident").send(mockincident1());
         var result = await request.post("/incident").send(mockincident2);
         result = await request.post("/incident").send(mockincident3);
         result = await request.get("/score/40.36459/122.124928").send(location);
-        //console.log(result.body);
         expect(result.body.score).toBe("Safety score at this location is 5 (very safe)");
         expect(result.status).toBe(200);
         done();
     });
     
     it("test getting a score near two incidents", async (done) => {
-        // reference location = [37.36459, -122.124928];
-
-        //populate the database with some incidents
-
-        //var result = await request.post("/incident").send(mockincident1());
         var result = await request.post("/incident").send(mockincident2);
         result = await request.post("/incident").send(mockincident3);
         result = await request.get("/score/37.36459/-122.124928").send(location);
-        //console.log(result);
         expect(result.body.score).toBe("Safety score at this location is 4 (safe)");
         expect(result.status).toBe(200);
         done();
@@ -181,7 +143,6 @@ describe("Integration tests", () => {
         result = await request.post("/incident").send(incident7);
 
         result = await request.get("/score/100/100").send(location);
-        //console.log(result);
         expect(result.body.score).toBe("Safety score at this location is 3 (somewhat safe)");
         expect(result.status).toBe(200);
         done();
@@ -203,7 +164,6 @@ describe("Integration tests", () => {
         result = await request.post("/incident").send(incident11);
 
         result = await request.get("/score/100/100").send(location);
-        //console.log(result);
         expect(result.body.score).toBe("Safety score at this location is 1 (very unsafe)");
         expect(result.status).toBe(200);
         done();
@@ -238,7 +198,7 @@ describe("Integration tests", () => {
         response = await request.post("/incident").send(mockincident3);
         response = await request.post("/delete").send(mockincident2);
         const result = await request.get("/incident");
-        //console.log(mockincident2);
+
         expect(response.status).toBe(200);
         expect(result.body).toHaveLength(1);
         expect(result.body[0].title).toBe(mockincident3.title);

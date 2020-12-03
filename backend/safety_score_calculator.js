@@ -29,12 +29,9 @@ function makescore(nearIncidents){
 /*This function returns the distance between
   the given location and incident in km*/
 function getdist(location, incident) {
-    //console.log(location);
-    //console.log(incident);
     const mToKm = 0.001;
     var dist = geolib.getDistance(location, 
         {latitude: incident.latitude, longitude: incident.longitude}, 1);
-    //console.log(dist * mToKm);
     return dist * mToKm;
 }
 
@@ -86,11 +83,8 @@ exports.getScore = function (location, incidents) {
     var incident;
     var score;
     var nearIncidents = 0;
-    //console.log(incidents);
-    //console.log(location);
     score = filterBad(location, incidents);
     if (score) {
-        //console.log(score);
         return score;
     }
     for (incident of incidents) {

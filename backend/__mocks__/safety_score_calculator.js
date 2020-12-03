@@ -15,7 +15,6 @@ function validLatLong(location) {
 
 exports.getScore = function (location, incidents) {
     var score;
-    //console.log(location);
     if (hasLocation(location)) {
         return -1;
     }

@@ -1,6 +1,5 @@
 const mongoClient = require("mongodb").MongoClient;
 
-//var jest = require("@jest/globals").jest;
 const { expect } = require("@jest/globals");
 
 var App = require("./app");
@@ -42,11 +41,6 @@ describe("Test request handler", () => {
     afterAll(async (done) => {
         await request.delete("/shutdown");
         await connection.close(done);
-        //await global.__MONGOD__.stop();
-    });
-    
-    beforeEach(async () => {
-        //to be added once more tests are implemented
     });
 
     afterEach( async () => {
@@ -60,18 +54,13 @@ describe("Test request handler", () => {
 
         const mock1 = mockincident1();
         
-        //console.log(result);
         const response = await request.get("/incident");
-        //console.log(response.body);
         expect(response.body[0].title).toBe(mock1.title);
         expect(response.body[0].severity).toBe(mock1.severity);
         expect(response.body[0].latitude).toBe(mock1.latitude);
         expect(response.body[0].longitude).toBe(mock1.longitude);
         expect(response.status).toBe(200);
         expect(result.status).toBe(200);
-
-        //result = await request.delete("/incident");
-        //console.log(mockincidentlist())
         done();
     });
 
@@ -103,9 +92,7 @@ describe("Test request handler", () => {
     });
 
     it("test getting score", async (done) => {
-        //location = [37.36459, -122.124928];
         const response = await request.get("/score/37.36459/-122.124928");
-        //console.log(response.body);
         expect(response.body.score).toBe("Safety score at this location is 3 (somewhat safe)");
         expect(response.status).toBe(200);
         done();
