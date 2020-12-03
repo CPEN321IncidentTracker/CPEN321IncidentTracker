@@ -1,7 +1,5 @@
 package com.example.locationtest;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -14,11 +12,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,7 +30,6 @@ public class NewIncidentPostActivity extends AppCompatActivity {
     private static final String BASE_URL = "http://52.149.135.175:80";
     private LatLng location;
     private EditText incidentTitleEntry;
-    private Spinner incidentSeverityEntry;
     private String incidentSeverity;
     private Button submitButton;
 
@@ -42,7 +39,8 @@ public class NewIncidentPostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_incident_post);
 
-        double latitude, longitude;
+        double latitude;
+        double longitude;
 
         //Get lat and long from map
         Bundle extras = getIntent().getExtras();
@@ -64,7 +62,7 @@ public class NewIncidentPostActivity extends AppCompatActivity {
 
         // Instantiate text entries and buttons
         incidentTitleEntry = findViewById(R.id.incidentTitleEntry);
-        incidentSeverityEntry = findViewById(R.id.incidentSeverityEntry);
+        Spinner incidentSeverityEntry = findViewById(R.id.incidentSeverityEntry);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.numbers, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

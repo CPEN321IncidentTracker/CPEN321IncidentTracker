@@ -1,15 +1,8 @@
 package com.example.locationtest;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -24,6 +17,9 @@ import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -37,10 +33,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,7 +54,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private RetrofitInterface retrofitInterface;
     private Incident selectedIncident;
     private boolean incidentSelected = false;
-    private String deletePassword;
     private Circle safetyCircle;
 
 
@@ -324,8 +317,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void applyTexts(String password) {
-        deletePassword = password;
-        if (deletePassword.equals("Cpen321") && incidentSelected){
+        if (password.equals("Cpen321") && incidentSelected){
             Call<Void> call = retrofitInterface.deleteIncident(selectedIncident);
             call.enqueue(new Callback<Void>() {
                 @Override

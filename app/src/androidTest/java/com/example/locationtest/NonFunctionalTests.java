@@ -44,7 +44,7 @@ public class NonFunctionalTests {
         (new TouchAction(driver)).press(point(831, 1456)).moveTo(point(352, 919)).release().perform();
 
         MobileElement element = (MobileElement) driver.findElementByAccessibilityId("You are here. ");
-        (new TouchAction(driver)).longPress(PointOption.point(element.getCenter())).waitAction().moveTo(point(x, y)).release().perform();
+        (new TouchAction(driver)).longPress(point(element.getCenter())).waitAction().moveTo(point(x, y)).release().perform();
 
         MobileElement el4 = (MobileElement) driver.findElementById("com.example.locationtest:id/addIncidentButton");
         el4.click();

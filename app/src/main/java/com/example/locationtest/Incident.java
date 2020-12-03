@@ -7,7 +7,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 // Describes an incident with title, severity, and location and (latitude, longitude)
 public class Incident {

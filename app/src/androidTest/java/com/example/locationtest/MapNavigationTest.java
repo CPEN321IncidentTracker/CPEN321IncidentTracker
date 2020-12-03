@@ -1,10 +1,7 @@
 package com.example.locationtest;
 
-import androidx.test.espresso.action.ViewActions;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -15,8 +12,6 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.remote.MobileCapabilityType;
 
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static io.appium.java_client.touch.offset.PointOption.point;
 
 @RunWith(AndroidJUnit4ClassRunner.class)

@@ -1,6 +1,5 @@
 package com.example.locationtest;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -33,6 +32,7 @@ public class DeleteDialog extends AppCompatDialogFragment {
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        // No functionality
 
                     }
                 })

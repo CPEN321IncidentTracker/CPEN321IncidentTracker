@@ -1,6 +1,5 @@
 package com.example.locationtest;
 
-import android.view.View;
 
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;

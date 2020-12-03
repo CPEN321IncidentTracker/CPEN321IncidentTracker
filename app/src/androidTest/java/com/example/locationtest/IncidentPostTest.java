@@ -1,8 +1,5 @@
 package com.example.locationtest;
 
-import android.os.Handler;
-import android.view.KeyEvent;
-import android.view.View;
 
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -11,26 +8,12 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import io.appium.java_client.MobileElement;
-import io.appium.java_client.TouchAction;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
-import io.appium.java_client.remote.MobileCapabilityType;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static io.appium.java_client.touch.offset.PointOption.point;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 
 @RunWith(AndroidJUnit4ClassRunner.class)
 public class IncidentPostTest {
