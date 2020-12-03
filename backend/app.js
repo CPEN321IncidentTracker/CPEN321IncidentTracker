@@ -78,6 +78,7 @@ mongoClient.connect(url, {
             });
     });
 
+
     //This function hanldes the calculation of a score based on 
     //the passed latitude and longitude
     //If latitude or longitude are not present, then this request
