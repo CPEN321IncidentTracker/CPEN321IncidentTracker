@@ -73,7 +73,7 @@ describe("Integration tests", () => {
         
         var result = await request.post("/incident").send(mockincident1());
 
-        const mock1 = mockincident1();;
+        const mock1 = mockincident1();
         const response = await request.get("/incident");
         expect(response.body[0].title).toBe(mock1.title);
         expect(response.body[0].severity).toBe(mock1.severity);
