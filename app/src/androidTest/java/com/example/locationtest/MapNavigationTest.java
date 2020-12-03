@@ -26,8 +26,6 @@ public class MapNavigationTest {
         dc.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
         dc.setCapability("appPackage", "com.example.locationtest");
         dc.setCapability("appActivity", ".MainActivity");
-        int x;
-        int y;
 
         AndroidDriver<AndroidElement> driver = new AndroidDriver<AndroidElement>(dc);
 

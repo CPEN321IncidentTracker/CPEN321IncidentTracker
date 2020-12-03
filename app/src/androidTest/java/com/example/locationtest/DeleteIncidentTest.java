@@ -26,7 +26,7 @@ public class DeleteIncidentTest {
         Thread.sleep(5000);
         onView(withId(R.id.deleteIncidentButton)).perform(click());
         onView(withId(R.id.deleteIncidentLayout)).check(matches(isDisplayed()));
-        onView(ViewMatchers.withText("DELETE")).perform(click());
+        onView(withText("DELETE")).perform(click());
         onView(withId(R.id.mapLayout)).check(matches(isDisplayed()));
         onView(withText("No Incident Selected")).inRoot(new ToastMatcher()).check(matches(isDisplayed()));
 
